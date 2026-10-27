@@ -1,0 +1,20 @@
+# Variables de entorno (contienen secretos, nunca se suben a git)
+.env
+
+# Java / Maven
+/target/
+*.class
+*.log
+
+# Node / Angular
+/node_modules/
+/dist/
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
