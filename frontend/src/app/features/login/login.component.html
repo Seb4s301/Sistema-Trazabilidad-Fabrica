@@ -1,76 +1,140 @@
-<div class="login-container min-vh-100 d-flex align-items-center">
-  <div class="login-card w-100">
-    <div class="row g-0">
-      <!-- Columna escritorio: imagen de planta -->
-      <div class="col-lg-6 d-none d-lg-block bg-dark">
-        <div class="plant-image h-100 d-flex align-items-center justify-content-center text-white p-5 position-relative">
-          <div class="overlay"></div>
-          <div class="content text-center z-2">
-            <h1 class="display-4 fw-light mb-3">El buen descanso empieza aquí.</h1>
-            <p class="lead mb-4 opacity-90">Cada orden, cada proceso y cada colchón. Toda tu producción, conectada.</p>
-            <div class="steps d-flex justify-content-center gap-4">
-              <span class="step">01 Planifica</span>
-              <span class="step">02 Produce</span>
-              <span class="step paso-03">03 Traza</span>
-            </div>
+<div class="login-container">
+  <div class="row g-0 login-row">
+    <!-- ================= COLUMNA IZQUIERDA: imagen de planta (escritorio) ================= -->
+    <div class="col-lg-6 d-none d-lg-block plant-column">
+      <div class="plant-image">
+        <div class="plant-overlay"></div>
+
+        <!-- Kicker superior -->
+        <div class="plant-kicker">
+          <span class="kicker-line"></span>
+          PRECISIÓN EN CADA ETAPA
+        </div>
+
+        <!-- Contenido inferior -->
+        <div class="plant-content">
+          <h1 class="plant-title">El buen descanso<br>empieza aquí.</h1>
+          <p class="plant-subtitle">Cada orden, cada proceso y cada colchón. Toda tu producción, conectada.</p>
+          <div class="plant-steps">
+            <span class="step">01 Planifica</span>
+            <span class="step">02 Produce</span>
+            <span class="step step-gold">03 Traza</span>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Columna formulario -->
-      <div class="col-lg-6 bg-white p-5">
-        <div class="brand text-center mb-4">
-          <div class="logo" style="font-size:2rem;color:#D4A935;font-weight:700;">LD</div>
-          <span class="kicker d-block text-xs text-uppercase letter-spacing-wider text-muted mb-2">ERP Y TRAZABILIDAD DE PRODUCCIÓN</span>
-          <h2 class="h4 mb-1">Bienvenido de nuevo</h2>
-          <p class="text-muted small">Ingresa con tu cuenta corporativa para continuar.</p>
-        </div>
-
-        <form (ngSubmit)="onSubmit()" [formGroup]="form" novalidate>
-          <div class="mb-3 position-relative">
-            <span class="form-icon position-absolute top-50 start-0 translate-middle-y text-muted">&#64;</span>
-            <input type="email" formControlName="correo" class="form-control ps-5"
-                   placeholder="correo corporativo"
-                   [class.is-invalid]="form.get('correo')?.invalid && form.get('correo')?.touched">
-            <div class="invalid-feedback" *ngIf="form.get('correo')?.invalid && form.get('correo')?.touched">
-              Ingresa un correo corporativo válido.
-            </div>
-          </div>
-
-          <div class="mb-3 position-relative">
-            <span class="form-icon position-absolute top-50 start-0 translate-middle-y text-muted">👁️</span>
-            <input type="password" formControlName="password" class="form-control ps-5"
-                   placeholder="contraseña"
-                   [class.is-invalid]="form.get('password')?.invalid && form.get('password')?.touched">
-            <div class="invalid-feedback" *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
-              La contraseña es obligatoria.
-            </div>
-          </div>
-
-          <div class="mb-3 form-check d-flex align-items-center">
-            <input type="checkbox" formControlName="recordar" class="form-check-input me-2">
-            <label class="form-check-label text-muted small">Recordarme</label>
-          </div>
-          <a href="#" class="stretched-link text-muted small">¿Olvidaste tu contraseña?</a>
-
-          <div class="alert alert-danger mt-3 d-none" [class.d-none]="!errorMessage" role="alert">
-            {{ errorMessage }}
-          </div>
-
-          <button type="submit" class="btn btn-ld-gold w-100 py-2 fw-semibold mt-3" [disabled]="loading">
-            <span *ngIf="!loading">Iniciar sesión</span>
-            <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-            Iniciando...
-          </button>
-
-          <p class="mt-3 text-center text-muted small">Acceso exclusivo para personal autorizado</p>
-        </form>
-
-        <div class="mt-4 text-center">
-          <p class="text-muted small">¿Necesitas ayuda? Contacta a soporte TI</p>
-          <p class="text-muted small">© 2026 Latin Dream · Todos los derechos reservados</p>
+    <!-- ================= COLUMNA DERECHA: formulario ================= -->
+    <div class="col-lg-6 form-column">
+      <!-- Logo -->
+      <div class="brand">
+        <div class="brand-logo">
+          <span class="brand-mark">LD</span>
+          <span class="brand-text">
+            <span class="brand-name">Latin Dream</span>
+            <span class="brand-sub">GESTIÓN INDUSTRIAL</span>
+          </span>
         </div>
       </div>
+
+      <!-- Formulario -->
+      <main class="form-main">
+        <div class="form-wrapper">
+          <span class="form-kicker">ERP Y TRAZABILIDAD DE PRODUCCIÓN</span>
+          <h2 class="form-title">Bienvenido de nuevo</h2>
+          <p class="form-subtitle">Ingresa con tu cuenta corporativa para continuar.</p>
+
+          <form (ngSubmit)="onSubmit()" [formGroup]="form" novalidate>
+            <!-- Correo -->
+            <div class="form-group">
+              <label class="form-label" for="correo">Correo corporativo</label>
+              <div class="input-wrap">
+                <input
+                  id="correo"
+                  type="email"
+                  formControlName="correo"
+                  class="form-control ld-input"
+                  placeholder="maria.rojas@latindream.com"
+                  [class.is-invalid]="form.get('correo')?.invalid && form.get('correo')?.touched">
+                <span class="input-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                    <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                    <path d="m3 7 9 6 9-6"></path>
+                  </svg>
+                </span>
+              </div>
+              <div class="field-error" *ngIf="form.get('correo')?.invalid && form.get('correo')?.touched">
+                Ingresa un correo corporativo válido.
+              </div>
+            </div>
+
+            <!-- Contraseña -->
+            <div class="form-group">
+              <label class="form-label" for="password">Contraseña</label>
+              <div class="input-wrap">
+                <input
+                  id="password"
+                  [type]="mostrarPassword ? 'text' : 'password'"
+                  formControlName="password"
+                  class="form-control ld-input"
+                  placeholder="••••••••••••"
+                  [class.is-invalid]="form.get('password')?.invalid && form.get('password')?.touched">
+                <button type="button" class="input-icon icon-btn" (click)="togglePassword()"
+                        [attr.aria-label]="mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                  <svg *ngIf="!mostrarPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                    <path d="M3 3l18 18"></path>
+                    <path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c5 0 9 4.5 9 7a12 12 0 0 1-2.4 3.6"></path>
+                    <path d="M6.6 6.6A11.7 11.7 0 0 0 3 12c0 2.5 4 7 9 7a10.9 10.9 0 0 0 4.5-.9"></path>
+                    <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path>
+                  </svg>
+                  <svg *ngIf="mostrarPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                    <path d="M3 12s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7Z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+              <div class="field-error" *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
+                La contraseña es obligatoria.
+              </div>
+            </div>
+
+            <!-- Recordarme + olvidé contraseña (misma fila) -->
+            <div class="form-row">
+              <label class="check-wrap">
+                <input type="checkbox" formControlName="recordar">
+                <span>Recordarme</span>
+              </label>
+              <button type="button" class="link-btn">¿Olvidaste tu contraseña?</button>
+            </div>
+
+            <!-- Error de credenciales -->
+            <div class="alert-error" *ngIf="errorMessage" role="alert">
+              {{ errorMessage }}
+            </div>
+
+            <!-- Botón -->
+            <button type="submit" class="btn-ld-gold" [disabled]="loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              <span *ngIf="!loading" class="me-2 arrow">→</span>
+              {{ loading ? 'Iniciando...' : 'Iniciar sesión' }}
+            </button>
+
+            <p class="access-note">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="me-1">
+                <rect x="4" y="11" width="16" height="10" rx="2"></rect>
+                <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+              </svg>
+              Acceso exclusivo para personal autorizado
+            </p>
+          </form>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="form-footer">
+        <p>¿Necesitas ayuda? Contacta a soporte TI</p>
+        <p>© 2026 Latin Dream · Todos los derechos reservados</p>
+      </footer>
     </div>
   </div>
 </div>

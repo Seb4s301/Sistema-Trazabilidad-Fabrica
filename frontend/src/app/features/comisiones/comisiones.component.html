@@ -1,0 +1,117 @@
+<div class="page-header d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+  <div>
+    <div class="eyebrow mb-1">VENTAS Y PRODUCCIÓN</div>
+    <h1 class="page-title">Gestión de Comisiones por Producto</h1>
+    <p class="page-subtitle">Visualiza, calcula y audita comisiones por venta y producción para cada modelo, categoría y estado de pago.</p>
+  </div>
+    <button type="button" class="btn btn-outline-dark">Exportar Reporte de Comisiones</button>
+</div>
+
+<!-- KPIs -->
+<div class="kpi-grid row g-3 mb-4">
+  <div class="col-6 col-xl-3" *ngFor="let k of kpis">
+    <div class="kpi-card">
+      <div class="kpi-label">{{ k.etiqueta }}</div>
+      <div class="kpi-value">{{ k.valor }}</div>
+      <div class="kpi-note" [ngClass]="k.notaTipo === 'warning' ? 'note-warning' : 'note-muted'">{{ k.nota }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Tabla de cálculo -->
+<div class="card ld-card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="card-title mb-0">Cálculo de comisiones por modelo</h5>
+    <span class="muted-small d-none d-md-inline">monto_total = unidades × precio_base × % / 100</span>
+  </div>
+
+  <!-- Tabla (escritorio) -->
+  <div class="table-responsive d-none d-md-block">
+    <table class="table ld-table align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Tipo / Modelo</th>
+          <th>Categoría / Plaza</th>
+          <th>Unidades</th>
+          <th>Precio base</th>
+          <th>% Comisión</th>
+          <th>Monto total</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let f of filas">
+          <td class="cell-strong">{{ f.modelo }}</td>
+          <td>{{ f.categoria }}</td>
+          <td>{{ f.unidades }}</td>
+          <td>{{ montoTexto(f.precioBase) }}</td>
+          <td>{{ f.porcentaje }}%</td>
+          <td class="cell-strong">{{ montoTexto(f.monto) }}</td>
+          <td><span class="pill" [ngClass]="claseEstado[f.estado]"><span class="pill-dot"></span>{{ f.estado }}</span></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="5" class="foot-total">Total</td>
+          <td class="foot-amount">{{ montoTexto(11660) }}</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- Tarjetas (móvil) -->
+  <div class="comision-cards d-md-none">
+    <div class="comision-card" *ngFor="let f of filas">
+      <div class="cc-top d-flex justify-content-between align-items-center">
+        <span class="cell-strong">{{ f.modelo }} · {{ f.categoria }}</span>
+        <span class="pill" [ngClass]="claseEstado[f.estado]"><span class="pill-dot"></span>{{ f.estado }}</span>
+      </div>
+      <div class="cc-grid">
+        <div><span class="lbl">Unidades</span><span class="val">{{ f.unidades }}</span></div>
+        <div><span class="lbl">Precio base</span><span class="val">{{ montoTexto(f.precioBase) }}</span></div>
+        <div><span class="lbl">% Comisión</span><span class="val">{{ f.porcentaje }}%</span></div>
+        <div><span class="lbl">Monto total</span><span class="val strong">{{ montoTexto(f.monto) }}</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Distribución -->
+<div class="row g-3">
+  <div class="col-12 col-lg-6">
+    <div class="card ld-card h-100">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Distribución de comisiones</h5>
+        <span class="muted-small">Por modelo</span>
+      </div>
+      <div class="card-body">
+        <div class="hbar-row" *ngFor="let d of distribucionModelo">
+          <span class="hbar-label">{{ d.label }}</span>
+          <div class="hbar-track">
+            <div class="hbar-fill" [style.width.%]="(d.valor / maxModelo) * 100"></div>
+          </div>
+          <span class="hbar-value">{{ montoTexto(d.valor) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-6">
+    <div class="card ld-card h-100">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Distribución de comisiones</h5>
+        <span class="muted-small">Por relleno</span>
+      </div>
+      <div class="card-body">
+        <div class="hbar-row" *ngFor="let d of distribucionRelleno">
+          <span class="hbar-label">{{ d.label }}</span>
+          <div class="hbar-track">
+            <div class="hbar-fill fill-slate" [style.width.%]="(d.valor / maxRelleno) * 100"></div>
+          </div>
+          <span class="hbar-value">{{ montoTexto(d.valor) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

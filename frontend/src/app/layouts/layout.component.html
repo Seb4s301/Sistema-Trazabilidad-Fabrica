@@ -1,10 +1,45 @@
-<div class="app-shell d-flex">
-  <app-sidebar></app-sidebar>
-  <div class="app-body d-flex flex-column flex-grow-1">
-    <app-header></app-header>
-    <main class="container-fluid mt-4 flex-grow-1">
+<div class="layout d-flex">
+  <!-- Sidebar fijo (escritorio) -->
+  <app-sidebar class="sidebar-desktop"></app-sidebar>
+
+  <!-- Contenido principal -->
+  <div class="main-content flex-grow-1">
+    <!-- Header superior -->
+    <app-header
+      [breadcrumb]="breadcrumb"
+      [pageTitle]="pageTitle"
+      [today]="today"></app-header>
+
+    <!-- Contenido de la ruta -->
+    <div class="page-body">
       <router-outlet></router-outlet>
-    </main>
-    <app-footer></app-footer>
+    </div>
+
+    <!-- Footer -->
+    <app-footer [ultimaSinc]="ultimaSincronizacion"></app-footer>
   </div>
 </div>
+
+<!-- Barra inferior fija (móvil) -->
+<nav class="mobile-bottombar d-lg-none">
+  <a routerLink="/resumen" routerLinkActive="active" class="bottom-item">
+    <span class="bottom-icon">▦</span>
+    <span class="bottom-label">Resumen</span>
+  </a>
+  <a routerLink="/ordenes" routerLinkActive="active" class="bottom-item">
+    <span class="bottom-icon">📄</span>
+    <span class="bottom-label">Órdenes</span>
+  </a>
+  <a routerLink="/produccion" routerLinkActive="active" class="bottom-item">
+    <span class="bottom-icon">🏭</span>
+    <span class="bottom-label">Producción</span>
+  </a>
+  <a routerLink="/comisiones" routerLinkActive="active" class="bottom-item">
+    <span class="bottom-icon">💰</span>
+    <span class="bottom-label">Comisiones</span>
+  </a>
+  <a routerLink="/despacho" routerLinkActive="active" class="bottom-item">
+    <span class="bottom-icon">🚚</span>
+    <span class="bottom-label">Despacho</span>
+  </a>
+</nav>

@@ -1,0 +1,331 @@
+.eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--ld-muted);
+  font-weight: 600;
+}
+.page-title {
+  font-size: 1.9rem;
+  font-weight: 400;
+  color: var(--ld-text);
+  margin-bottom: 4px;
+}
+.page-subtitle {
+  color: var(--ld-muted);
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+/* Métricas */
+.metric-strip .metric-card {
+  background: var(--ld-card);
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 14px 16px;
+  height: 100%;
+}
+.metric-label {
+  font-size: 0.72rem;
+  color: var(--ld-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.metric-value {
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: var(--ld-text);
+}
+.metric-danger .metric-value {
+  color: var(--ld-danger);
+}
+
+/* Filtros */
+.filter-bar {
+  background: var(--ld-card);
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 12px;
+}
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  border-radius: 8px;
+  font-size: 0.86rem;
+}
+.filter-select {
+  width: auto;
+  min-width: 150px;
+  border-radius: 8px;
+  font-size: 0.86rem;
+}
+
+.view-toggle {
+  background: #F3F4F6;
+  border-radius: 8px;
+  padding: 3px;
+  margin-left: auto;
+}
+.toggle-btn {
+  background: transparent;
+  border: none;
+  font-size: 0.82rem;
+  color: var(--ld-muted);
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.toggle-btn.active {
+  background: var(--ld-card);
+  color: var(--ld-text);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* Kanban */
+.kanban {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  align-items: flex-start;
+}
+
+.kanban-col {
+  flex: 1;
+  min-width: 230px;
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.col-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.col-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--ld-text);
+}
+
+.col-count {
+  background: var(--ld-sidebar);
+  color: var(--ld-gold);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.col-subtitle {
+  font-size: 0.7rem;
+  color: var(--ld-muted);
+  margin-bottom: 12px;
+}
+
+.col-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.col-empty {
+  font-size: 0.78rem;
+  color: var(--ld-muted);
+  text-align: center;
+  padding: 20px 8px;
+}
+
+/* Tarjeta de lote */
+.lote-card {
+  background: var(--ld-card);
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 12px;
+  transition: box-shadow 0.15s;
+}
+.lote-card:hover {
+  box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+}
+.lote-card.card-delayed {
+  border-color: #f6c8c4;
+  background: #FEF7F6;
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.card-orden {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ld-text);
+  font-family: monospace;
+}
+
+.card-modelo {
+  font-size: 0.84rem;
+  color: var(--ld-text);
+  margin-bottom: 2px;
+}
+
+.card-unidades {
+  font-size: 0.78rem;
+  color: var(--ld-muted);
+  margin-bottom: 4px;
+}
+
+.card-codigo {
+  font-size: 0.72rem;
+  color: var(--ld-muted);
+  font-family: monospace;
+  background: #F3F4F6;
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+.card-codigo-inline {
+  font-family: monospace;
+  background: #F3F4F6;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.74rem;
+}
+
+.card-delay {
+  font-size: 0.76rem;
+  color: var(--ld-danger);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.card-approved {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.approved-note {
+  font-size: 0.72rem;
+  color: var(--ld-success);
+}
+
+.card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  border-top: 1px solid #F3F4F6;
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+.card-responsable {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.mini-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--ld-sidebar);
+  color: var(--ld-gold);
+  font-size: 0.6rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.resp-name {
+  font-size: 0.74rem;
+  color: var(--ld-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-entrega {
+  font-size: 0.72rem;
+  color: var(--ld-muted);
+  white-space: nowrap;
+}
+.card-entrega.delayed {
+  color: var(--ld-danger);
+  font-weight: 600;
+}
+
+/* Píldoras */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.pill-warning { background: #FBF3DC; color: #8A6100; }
+.pill-success { background: #E8F5EE; color: #1E7B4F; }
+.pill-danger { background: #FDECEA; color: #B42318; }
+.pill-slate { background: #EEF1F4; color: #6B7A8A; }
+
+/* Lista (móvil) */
+.lista-vista {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.area-group-head {
+  background: var(--ld-sidebar);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.area-units {
+  font-size: 0.74rem;
+  color: var(--ld-gold);
+  font-weight: 500;
+}
+
+.lote-card.lista {
+  margin-bottom: 10px;
+}
+
+/* Pie */
+.board-footer {
+  font-size: 0.8rem;
+}
+.total-line {
+  color: var(--ld-text);
+  font-weight: 600;
+}
+.note-line {
+  color: var(--ld-muted);
+}

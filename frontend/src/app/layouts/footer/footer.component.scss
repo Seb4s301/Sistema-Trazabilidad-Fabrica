@@ -1,3 +1,20 @@
-.footer {
-  border-top-color: #e9ecef !important;
+.app-footer {
+  background: transparent;
+  border-top: 1px solid #E5E7EB;
+  padding: 14px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  color: var(--ld-muted);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 767.98px) {
+  .app-footer {
+    flex-direction: column;
+    text-align: center;
+    padding: 14px 16px;
+  }
 }

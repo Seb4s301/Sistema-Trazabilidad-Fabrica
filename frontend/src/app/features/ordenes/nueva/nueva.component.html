@@ -1,0 +1,253 @@
+<div class="page-header mb-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+    <div>
+      <div class="eyebrow mb-1">ÓRDENES / NUEVA</div>
+      <h1 class="page-title">Nueva orden de fabricación</h1>
+      <p class="page-subtitle">Define el producto y programa su ingreso a producción.</p>
+    </div>
+    <span class="pill pill-slate"><span class="pill-dot"></span>Borrador sin guardar</span>
+  </div>
+</div>
+
+<!-- Stepper -->
+<div class="stepper mb-4">
+  <div class="step" [class.active]="paso >= 1" [class.done]="paso > 1">
+    <span class="step-num">{{ paso > 1 ? '✓' : '1' }}</span>
+    <span class="step-label">Producto</span>
+  </div>
+  <div class="step-line" [class.filled]="paso > 1"></div>
+  <div class="step" [class.active]="paso >= 2" [class.done]="paso > 2">
+    <span class="step-num">{{ paso > 2 ? '✓' : '2' }}</span>
+    <span class="step-label">Planificación</span>
+  </div>
+  <div class="step-line" [class.filled]="paso > 2"></div>
+  <div class="step" [class.active]="paso >= 3">
+    <span class="step-num">3</span>
+    <span class="step-label">Confirmación</span>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Columna principal -->
+  <div class="col-12 col-xl-8">
+
+    <!-- PASO 1 -->
+    <div *ngIf="paso === 1" class="section-card">
+      <div class="section-head">
+        <span class="section-num">01</span>
+        <span class="section-title">Especificaciones del producto</span>
+      </div>
+
+      <!-- Modelo -->
+      <div class="mb-4">
+        <label class="field-label">Modelo de colchón <span class="req">*</span></label>
+        <select class="form-select" [(ngModel)]="modeloId">
+          <option [ngValue]="null" disabled>Selecciona un modelo</option>
+          <option *ngFor="let m of modelos" [ngValue]="m.id">{{ m.nombre }}</option>
+        </select>
+        <div class="field-help" *ngIf="modeloSeleccionado">
+          Código de producto: <strong>{{ modeloSeleccionado.codigo }}</strong>
+        </div>
+      </div>
+
+      <!-- Dimensiones -->
+      <div class="mb-4">
+        <label class="field-label">Dimensiones / Plazas <span class="req">*</span></label>
+        <div class="chip-row">
+          <button type="button" class="chip" *ngFor="let d of dimensiones"
+                  [class.selected]="dimensionId === d.id"
+                  (click)="dimensionId = d.id">
+            {{ d.label }}
+          </button>
+        </div>
+        <div class="field-help" *ngIf="dimensionSeleccionada">{{ dimensionSeleccionada.medidas }}</div>
+      </div>
+
+      <!-- Relleno -->
+      <div class="mb-4">
+        <label class="field-label">Tipo de núcleo / Relleno <span class="req">*</span></label>
+        <div class="radio-cards">
+          <label class="radio-card" *ngFor="let r of rellenos"
+                 [class.selected]="rellenoId === r.id">
+            <input type="radio" name="relleno" [value]="r.id" [(ngModel)]="rellenoId" hidden>
+            <span class="radio-title">{{ r.titulo }}</span>
+            <span class="radio-desc">{{ r.descripcion }}</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Cantidad -->
+      <div class="mb-2">
+        <label class="field-label">Cantidad de colchones <span class="req">*</span></label>
+        <input type="number" class="form-control qty-input" min="1" [(ngModel)]="cantidad"
+               placeholder="0">
+        <div class="field-help">Unidad de fabricación: colchones terminados</div>
+        <div class="field-error" *ngIf="cantidad !== null && cantidad < 1">La cantidad mínima es 1.</div>
+      </div>
+    </div>
+
+    <!-- PASO 2 -->
+    <div *ngIf="paso === 2" class="section-card">
+      <div class="section-head">
+        <span class="section-num">02</span>
+        <span class="section-title">Planificación y entrega</span>
+      </div>
+
+      <!-- Fecha -->
+      <div class="mb-4">
+        <label class="field-label">Fecha límite de entrega <span class="req">*</span></label>
+        <input type="date" class="form-control" [(ngModel)]="fechaEntrega">
+        <div class="field-help" *ngIf="fechaEntrega && !insuficiente">
+          {{ diasHabilesDisponibles }} días hábiles disponibles. La orden se incorporará a la cola de corte.
+        </div>
+        <div class="field-warning" *ngIf="insuficiente">
+          ⚠️ La fecha es pasada o no alcanzan suficientes días hábiles para producir la orden.
+        </div>
+      </div>
+
+      <!-- Prioridad -->
+      <div class="mb-4">
+        <label class="field-label">Prioridad <span class="req">*</span></label>
+        <div class="chip-row">
+          <button type="button" class="chip" *ngFor="let p of ['Alta','Normal','Baja']"
+                  [class.selected]="prioridad === p"
+                  [class.chip-danger]="p === 'Alta'"
+                  (click)="prioridad = p">
+            {{ p }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Observaciones -->
+      <div class="mb-2">
+        <label class="field-label">Observaciones de fabricación</label>
+        <textarea class="form-control" rows="4" [(ngModel)]="observaciones"
+                  placeholder="Indicaciones para los responsables de cada etapa..."></textarea>
+        <div class="field-help">Visibles para los responsables de cada etapa.</div>
+      </div>
+    </div>
+
+    <!-- PASO 3 -->
+    <div *ngIf="paso === 3" class="section-card">
+      <div class="section-head">
+        <span class="section-num">03</span>
+        <span class="section-title">Confirmación</span>
+      </div>
+
+      <div class="confirm-grid">
+        <div class="confirm-item">
+          <span class="lbl">Número de orden</span>
+          <span class="val">{{ numeroOrden }}</span>
+        </div>
+        <div class="confirm-item">
+          <span class="lbl">Modelo</span>
+          <span class="val">{{ modeloSeleccionado?.nombre || '—' }}</span>
+        </div>
+        <div class="confirm-item">
+          <span class="lbl">Dimensión</span>
+          <span class="val">{{ dimensionSeleccionada?.label || '—' }}</span>
+        </div>
+        <div class="confirm-item">
+          <span class="lbl">Relleno</span>
+          <span class="val">{{ rellenoSeleccionado?.titulo || '—' }}</span>
+        </div>
+        <div class="confirm-item">
+          <span class="lbl">Cantidad</span>
+          <span class="val">{{ cantidad || 0 }} colchones</span>
+        </div>
+        <div class="confirm-item">
+          <span class="lbl">Prioridad</span>
+          <span class="val">{{ prioridad || '—' }}</span>
+        </div>
+        <div class="confirm-item">
+          <span class="lbl">Entrega comprometida</span>
+          <span class="val">{{ fechaEntrega || '—' }}</span>
+        </div>
+        <div class="confirm-item">
+          <span class="lbl">Etapa inicial</span>
+          <span class="val">Pendiente de corte</span>
+        </div>
+      </div>
+
+      <div class="field-help mt-3">
+        El código de lote se generará al crear la orden para asegurar su trazabilidad.
+      </div>
+    </div>
+
+    <!-- Barra de acciones -->
+    <div class="action-bar d-flex flex-wrap justify-content-between align-items-center gap-2 mt-4">
+      <span class="required-note">Los campos con * son obligatorios.</span>
+      <div class="action-buttons d-flex flex-wrap gap-2">
+        <button class="btn btn-outline-secondary" (click)="cancelar()">Cancelar</button>
+        <button class="btn btn-outline-dark" (click)="guardarBorrador()" [disabled]="guardando || !esBorradorValido">
+          Guardar borrador
+        </button>
+
+        <button class="btn btn-outline-dark" *ngIf="paso < 3" (click)="siguiente()"
+                [disabled]="(paso === 1 && !esCompleto) || (paso === 2 && (!fechaEntrega || !prioridad))">
+          Siguiente
+        </button>
+
+        <button class="btn btn-ld-gold" *ngIf="paso === 3" (click)="crearOrden()"
+                [disabled]="guardando || !esCompleto">
+          Crear orden de fabricación
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Columna derecha: Resumen -->
+  <div class="col-12 col-xl-4">
+    <div class="summary-card">
+      <div class="summary-title">Resumen de la orden</div>
+
+      <div class="summary-row">
+        <span class="lbl">Número de orden</span>
+        <span class="val mono">{{ numeroOrden }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="lbl">Modelo</span>
+        <span class="val">{{ modeloSeleccionado?.nombre || '—' }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="lbl">Dimensión</span>
+        <span class="val">{{ dimensionSeleccionada?.label || '—' }}</span>
+      </div>
+      <div class="summary-row" *ngIf="dimensionSeleccionada">
+        <span class="lbl">Medidas</span>
+        <span class="val small">{{ dimensionSeleccionada.medidas }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="lbl">Relleno</span>
+        <span class="val">{{ rellenoSeleccionado?.titulo || '—' }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="lbl">Cantidad</span>
+        <span class="val">{{ cantidad || 0 }} colchones</span>
+      </div>
+      <div class="summary-row">
+        <span class="lbl">Prioridad</span>
+        <span class="val">{{ prioridad || '—' }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="lbl">Entrega comprometida</span>
+        <span class="val">{{ fechaEntrega || '—' }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="lbl">Etapa inicial</span>
+        <span class="val">Pendiente de corte</span>
+      </div>
+      <div class="summary-row">
+        <span class="lbl">Registrado por</span>
+        <span class="val">{{ registradoPor }} · {{ turno }}</span>
+      </div>
+
+      <div class="black-card">
+        <span class="black-card-label">LISTA PARA PRODUCCIÓN</span>
+        <span class="black-card-status" [class.ready]="esCompleto">
+          {{ esCompleto ? 'Datos completos' : 'Faltan campos' }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

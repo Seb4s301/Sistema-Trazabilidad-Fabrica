@@ -1,0 +1,151 @@
+<div class="page-header d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+  <div>
+    <div class="eyebrow mb-1">LOGÍSTICA Y ENTREGAS</div>
+    <h1 class="page-title">{{ tituloFecha }}</h1>
+    <p class="page-subtitle">{{ resumen }}</p>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <button type="button" class="btn btn-outline-dark">Exportar resumen</button>
+    <button type="button" class="btn btn-ld-gold">Programar despacho</button>
+  </div>
+</div>
+
+<!-- Banner de último movimiento -->
+<div class="move-banner mb-4">📢 {{ banner }}</div>
+
+<!-- KPIs -->
+<div class="kpi-grid row g-3 mb-4">
+  <div class="col-6 col-xl-3" *ngFor="let k of kpis">
+    <div class="kpi-card">
+      <div class="kpi-label">{{ k.etiqueta }}</div>
+      <div class="kpi-value" [ngClass]="{'valor-transito': k.tipo==='transito', 'valor-ok': k.tipo==='entregado'}">{{ k.valor }}</div>
+      <div class="kpi-note" *ngIf="k.nota">{{ k.nota }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Filtros -->
+<div class="filter-bar d-flex flex-wrap gap-2 mb-4 align-items-center">
+  <select class="form-select filter-select" [(ngModel)]="filtroEstado">
+    <option value="">Estado</option>
+    <option value="programado">Programado</option>
+    <option value="transito">En tránsito</option>
+    <option value="entregado">Entregado</option>
+  </select>
+  <select class="form-select filter-select" [(ngModel)]="filtroCliente">
+    <option value="">Cliente</option>
+    <option *ngFor="let c of clientes" [value]="c">{{ c }}</option>
+  </select>
+  <select class="form-select filter-select" [(ngModel)]="filtroVehiculo">
+    <option value="">Vehículo</option>
+    <option *ngFor="let v of vehiculos" [value]="v">{{ v }}</option>
+  </select>
+  <input type="date" class="form-control filter-select" [(ngModel)]="filtroFecha">
+  <button type="button" class="btn btn-dark" (click)="aplicarFiltros()">Aplicar filtros</button>
+</div>
+
+<!-- Seguimiento de envíos -->
+<h5 class="section-h mb-3">Seguimiento de envíos</h5>
+
+<div class="row g-3 mb-4">
+  <div class="col-12 col-xl-6" *ngFor="let d of despachosFiltrados">
+    <div class="ship-card" [class.ship-open]="detalleAbierto?.codigo === d.codigo">
+      <div class="ship-top d-flex justify-content-between align-items-start gap-2">
+        <div>
+          <div class="ship-codigo">{{ d.codigo }}</div>
+          <div class="ship-cliente">{{ d.cliente }}</div>
+          <div class="ship-destino">{{ d.destino }}</div>
+        </div>
+        <span class="pill" [ngClass]="claseEstado(d.estado)"><span class="pill-dot"></span>{{ estadoLabel(d.estado) }}</span>
+      </div>
+
+      <div class="ship-grid">
+        <div><span class="lbl">Unidades</span><span class="val">{{ d.unidades }} colchones</span></div>
+        <div><span class="lbl">Vehículo</span><span class="val">{{ d.vehiculo }}</span></div>
+        <div><span class="lbl">Conductor</span><span class="val">{{ d.conductor }}</span></div>
+        <div><span class="lbl">Salida</span><span class="val">{{ d.salida }}</span></div>
+        <div><span class="lbl">Entrega estimada</span><span class="val">{{ d.entregaEstimada }}</span></div>
+      </div>
+
+        <button type="button" class="btn btn-outline-secondary btn-sm w-100 mt-2" (click)="abrirDetalle(d)">
+        {{ detalleAbierto?.codigo === d.codigo ? 'Ocultar detalle' : 'Ver detalle de despacho' }}
+      </button>
+
+      <!-- Detalle -->
+      <div class="ship-detail" *ngIf="detalleAbierto?.codigo === d.codigo">
+        <div class="detail-block">
+          <div class="detail-title">Preparación de carga</div>
+          <div class="detail-row"><span>Lote asociado</span><strong>LT-2610-0418</strong></div>
+          <div class="detail-row"><span>Producto</span><strong>Comfort Plus · Queen</strong></div>
+          <div class="detail-row"><span>Carga</span><strong>{{ d.unidades }} unidades</strong></div>
+          <div class="detail-row"><span>Salida</span><strong>{{ d.salida }}</strong></div>
+          <div class="detail-row"><span>Entrega estimada</span><strong>{{ d.entregaEstimada }}</strong></div>
+          <div class="detail-row"><span>Responsable</span><strong>{{ d.conductor }}</strong></div>
+        </div>
+
+        <div class="detail-block">
+          <div class="detail-title">Asignación de vehículo</div>
+          <div class="detail-row"><span>Vehículo</span><strong>{{ d.vehiculo }}</strong></div>
+          <div class="detail-row"><span>Capacidad</span><strong>120 colchones</strong></div>
+          <div class="detail-row"><span>Estado</span><strong>Operativo</strong></div>
+          <div class="detail-row"><span>Última revisión</span><strong>02 oct. 2026</strong></div>
+          <div class="detail-row"><span>Contacto</span><strong>+51 999 888 777</strong></div>
+        </div>
+
+        <div class="detail-block">
+          <div class="detail-title">Documentos</div>
+          <div class="doc-row">📄 Orden de despacho (PDF) <button class="btn btn-link btn-sm">Descargar</button></div>
+          <div class="doc-row">📄 Guía de remisión (PDF) <button class="btn btn-link btn-sm">Descargar</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Historial -->
+<h5 class="section-h mb-3">Historial de despachos</h5>
+
+<div class="card ld-card d-none d-md-block">
+  <div class="table-responsive">
+    <table class="table ld-table align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Despacho</th>
+          <th>Cliente</th>
+          <th>Unidades</th>
+          <th>Estado</th>
+          <th>Salida</th>
+          <th>Entrega</th>
+          <th>Vehículo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let h of historial">
+          <td class="cell-strong">{{ h.despacho }}</td>
+          <td>{{ h.cliente }}</td>
+          <td>{{ h.unidades }}</td>
+          <td><span class="pill" [ngClass]="claseHistorial(h.estado)"><span class="pill-dot"></span>{{ h.estado }}</span></td>
+          <td>{{ h.salida }}</td>
+          <td>{{ h.entrega }}</td>
+          <td>{{ h.vehiculo }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Historial tarjetas (móvil) -->
+<div class="hist-cards d-md-none">
+  <div class="hist-card" *ngFor="let h of historial">
+    <div class="d-flex justify-content-between align-items-center">
+      <span class="cell-strong">{{ h.despacho }}</span>
+      <span class="pill" [ngClass]="claseHistorial(h.estado)"><span class="pill-dot"></span>{{ h.estado }}</span>
+    </div>
+    <div class="cell-muted">{{ h.cliente }}</div>
+    <div class="hist-meta">
+      <span>{{ h.unidades }} uds.</span>
+      <span>{{ h.vehiculo }}</span>
+      <span>{{ h.salida }}</span>
+    </div>
+  </div>
+</div>

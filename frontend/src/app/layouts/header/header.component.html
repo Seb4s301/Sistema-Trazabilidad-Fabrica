@@ -1,11 +1,22 @@
-<header class="header bg-white border-bottom shadow-sm px-4 py-3 d-flex align-items-center justify-content-between">
-  <div class="header-brand d-flex align-items-center gap-3">
-    <span class="fw-bold" style="font-size:1.5rem;color:#D4A935;">LD</span>
-    <span class="fw-semibold text-dark">{{ title }}</span>
+<header class="app-header d-flex align-items-center justify-content-between">
+  <!-- Breadcrumb -->
+  <div class="breadcrumb-text d-none d-md-block">
+    <span class="muted">{{ breadcrumb }} /</span>
+    <span class="current">{{ pageTitle }}</span>
   </div>
-  <div class="header-actions d-flex align-items-center gap-3">
-    <span class="text-muted small d-none d-md-inline-block">Sistema de Trazabilidad de Fábrica</span>
-    <button class="btn btn-outline-secondary btn-sm">Perfil</button>
-    <button class="btn btn-danger btn-sm">Cerrar sesión</button>
+
+  <!-- Logo móvil -->
+  <div class="mobile-brand d-md-none">
+    <div class="logo-mark">LD</div>
+    <span class="brand-name">Latin Dream</span>
+  </div>
+
+  <!-- Derecha: fecha, lupa, campana, turno -->
+  <div class="header-right d-flex align-items-center">
+    <span class="header-date d-none d-sm-inline">{{ today }}</span>
+    <button type="button" class="icon-btn" title="Buscar">🔍</button>
+    <button type="button" class="icon-btn" title="Notificaciones">🔔</button>
+    <span class="shift-chip">Turno A</span>
+    <div class="avatar d-none d-lg-flex">M</div>
   </div>
 </header>

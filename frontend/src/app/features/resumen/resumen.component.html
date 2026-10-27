@@ -1,0 +1,146 @@
+<div class="page-header d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+  <div>
+    <div class="eyebrow mb-1">VISIÓN GENERAL / SEMANA {{ semana }}</div>
+    <h1 class="page-title">Tu planta, en perspectiva.</h1>
+    <p class="page-subtitle">Indicadores de producción y prioridades del turno.</p>
+  </div>
+
+  <div class="header-controls d-flex flex-wrap align-items-center gap-2">
+    <select class="form-select range-select" [(ngModel)]="periodoSeleccionado">
+      <option value="semana42">Semana 42 · 13–17 oct. 2026</option>
+      <option value="semana41">Semana 41 · 6–10 oct. 2026</option>
+    </select>
+    <span class="updated-note d-none d-lg-inline">{{ rangoActualizado }}</span>
+    <button type="button" class="btn btn-outline-dark">Exportar informe</button>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="kpi-grid row g-3 mb-4">
+  <div class="col-6 col-lg-3" *ngFor="let k of kpis">
+    <div class="kpi-card">
+      <div class="kpi-label">{{ k.etiqueta }}</div>
+      <div class="kpi-value">{{ k.valor }}</div>
+      <div class="kpi-note" [ngClass]="'note-' + k.notaTipo">{{ k.nota }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Gráficos -->
+<div class="row g-3 mb-4">
+  <!-- Ritmo de producción -->
+  <div class="col-12 col-xl-7">
+    <div class="card ld-card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Ritmo de producción</h5>
+          <div class="btn-group btn-group-sm">
+            <button type="button" class="btn" [class.active]="vistaGrafico==='dia'" (click)="vistaGrafico='dia'">Día</button>
+            <button type="button" class="btn" [class.active]="vistaGrafico==='semana'" (click)="vistaGrafico='semana'">Semana</button>
+          </div>
+      </div>
+      <div class="card-body">
+        <div class="bar-chart position-relative">
+          <!-- línea de meta -->
+          <div class="meta-line" [style.bottom.%]="(240 / maxRitmo) * 100">
+            <span class="meta-label">Meta diaria: 240</span>
+          </div>
+
+          <div class="bars d-flex align-items-end justify-content-around h-100">
+            <div class="bar-wrapper d-flex flex-column align-items-center" *ngFor="let r of ritmo">
+              <div class="bar"
+                   [class.bar-highlight]="r.destacado"
+                   [style.height.%]="alturaBarra(r.valor)">
+                <span class="bar-value">{{ r.valor }}</span>
+              </div>
+              <span class="bar-label">{{ r.dia }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Donut estado órdenes -->
+  <div class="col-12 col-xl-5">
+    <div class="card ld-card h-100">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Estado de las órdenes</h5>
+        <span class="muted-small">{{ totalOrdenesActivas }} órdenes activas</span>
+      </div>
+      <div class="card-body d-flex align-items-center justify-content-center gap-4 flex-wrap">
+        <div class="donut" [style.background]="donutStyle">
+          <div class="donut-hole">
+            <span class="donut-total">{{ totalOrdenesActivas }}</span>
+            <span class="donut-caption">activas</span>
+          </div>
+        </div>
+
+        <div class="donut-legend">
+          <div class="legend-item" *ngFor="let d of donut">
+            <span class="legend-dot" [style.background]="d.color"></span>
+            <span class="legend-label">{{ d.label }}</span>
+            <span class="legend-value">{{ d.valor }}</span>
+            <span class="legend-pct">{{ porcentaje(d.valor) }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Órdenes bajo seguimiento -->
+<div class="card ld-card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="card-title mb-0">Órdenes bajo seguimiento</h5>
+    <a routerLink="/ordenes" class="link-gold">Ver todas →</a>
+  </div>
+
+  <!-- Tabla (escritorio) -->
+  <div class="table-responsive d-none d-md-block">
+    <table class="table ld-table align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Orden / Modelo</th>
+          <th>Cantidad</th>
+          <th>Etapa actual</th>
+          <th>Estado</th>
+          <th>Entrega</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let o of seguimiento">
+          <td>
+            <div class="cell-strong">{{ o.orden }}</div>
+            <div class="cell-muted">{{ o.modelo }}</div>
+          </td>
+          <td>{{ o.cantidad }}</td>
+          <td>{{ o.etapa }}</td>
+          <td><span class="pill" [ngClass]="'pill-' + o.estadoClase"><span class="pill-dot"></span>{{ o.estado }}</span></td>
+          <td>{{ o.entrega }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Tarjetas (móvil) -->
+  <div class="order-cards d-md-none">
+    <div class="order-card" *ngFor="let o of seguimiento">
+      <div class="order-card-top d-flex justify-content-between">
+        <span class="cell-strong">{{ o.orden }}</span>
+        <span class="pill" [ngClass]="'pill-' + o.estadoClase"><span class="pill-dot"></span>{{ o.estado }}</span>
+      </div>
+      <div class="cell-muted mb-2">{{ o.modelo }}</div>
+      <div class="order-card-meta d-flex justify-content-between">
+        <span>Cantidad: <strong>{{ o.cantidad }}</strong></span>
+        <span>Etapa: <strong>{{ o.etapa }}</strong></span>
+      </div>
+      <div class="order-card-entrega">Entrega: {{ o.entrega }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Banner de alerta -->
+<div class="alert-banner d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <span>⚠️ 2 lotes superaron su fecha de entrega y requieren seguimiento.</span>
+  <a routerLink="/produccion" class="link-warning">Ir a producción →</a>
+</div>

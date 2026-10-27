@@ -1,13 +1,55 @@
-<aside class="sidebar bg-dark text-white">
-  <div class="sidebar-brand p-3 text-center">
-    <span class="fw-bold" style="font-size:1.25rem;color:#D4A935;">LD</span>
+<aside class="sidebar">
+  <!-- Logo -->
+  <div class="sidebar-logo">
+    <div class="logo-mark">LD</div>
+    <div class="logo-text">Latin Dream</div>
   </div>
-  <nav class="nav flex-column p-3">
-    <a *ngFor="let item of menu" [routerLink]="item.path" routerLinkActive="active"
-       class="nav-link text-decoration-none text-white-50 d-flex align-items-center px-3 py-2 rounded"
-       [class.active]="isActive(item.path)">
-      <i class="bi me-2" [attr.class]="'bi ' + item.icon"></i>
-      {{ item.label }}
+
+  <!-- Sección -->
+  <div class="sidebar-section">ESPACIO DE TRABAJO</div>
+
+  <!-- Navegación -->
+  <nav class="sidebar-nav">
+    <a routerLink="/resumen" routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">▦</span>
+      <span>Resumen</span>
+    </a>
+    <a routerLink="/ordenes" routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">📄</span>
+      <span>Órdenes</span>
+    </a>
+    <a routerLink="/produccion" routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">🏭</span>
+      <span>Producción</span>
+      <span class="badge-count">{{ lotesEnPlanta }}</span>
+    </a>
+    <a routerLink="/comisiones" routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">💰</span>
+      <span>Comisiones</span>
+    </a>
+    <a routerLink="/despacho" routerLinkActive="active" class="nav-item">
+      <span class="nav-icon">🚚</span>
+      <span>Despacho y Transporte</span>
     </a>
   </nav>
+
+  <!-- Tarjeta de planta -->
+  <div class="plant-card">
+    <div class="plant-label">PLANTA PRINCIPAL</div>
+    <div class="plant-shift">Turno A · 06:00–14:00</div>
+    <div class="plant-status">
+      <span class="status-dot"></span>
+      Sistema en línea
+    </div>
+  </div>
+
+  <!-- Perfil -->
+  <div class="user-profile" *ngIf="authService.getUsuario() as u">
+    <div class="avatar">{{ u.nombre.charAt(0) }}</div>
+    <div class="user-info">
+      <div class="user-name">{{ u.nombre }}</div>
+      <div class="user-role">{{ u.rol }}</div>
+    </div>
+    <button class="settings-btn" (click)="logout()" title="Cerrar sesión">⚙</button>
+  </div>
 </aside>

@@ -13,6 +13,7 @@ export class LoginComponent {
   form: FormGroup;
   loading = false;
   errorMessage = '';
+  mostrarPassword = false;
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.form = this.fb.group({
@@ -22,8 +23,15 @@ export class LoginComponent {
     });
   }
 
+  togglePassword(): void {
+    this.mostrarPassword = !this.mostrarPassword;
+  }
+
   onSubmit(): void {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     this.loading = true;
     this.errorMessage = '';
@@ -40,7 +48,7 @@ export class LoginComponent {
       },
       error: () => {
         this.loading = false;
-        this.errorMessage = 'Credenciales inválidas. Intenta de nuevo.';
+        this.errorMessage = 'Credenciales inválidas. Verifica tu correo y contraseña.';
       }
     });
   }

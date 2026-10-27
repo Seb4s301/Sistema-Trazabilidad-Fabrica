@@ -1,0 +1,131 @@
+.eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--ld-muted);
+  font-weight: 600;
+}
+
+.page-title {
+  font-size: 1.9rem;
+  font-weight: 400;
+  color: var(--ld-text);
+  margin-bottom: 4px;
+}
+
+.page-subtitle {
+  color: var(--ld-muted);
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+.filter-bar {
+  background: var(--ld-card);
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  border-radius: 8px;
+  font-size: 0.86rem;
+}
+
+.filter-select {
+  width: auto;
+  min-width: 160px;
+  border-radius: 8px;
+  font-size: 0.86rem;
+}
+
+.ld-card {
+  background: var(--ld-card);
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.ld-table {
+  font-size: 0.86rem;
+}
+.ld-table thead th {
+  background: #F9FAFB;
+  color: var(--ld-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  border-bottom: 1px solid #E5E7EB;
+  padding: 12px 20px;
+}
+.ld-table tbody td {
+  padding: 14px 20px;
+  border-bottom: 1px solid #F3F4F6;
+  color: var(--ld-text);
+}
+
+.cell-strong { font-weight: 600; color: var(--ld-text); }
+.cell-muted { font-size: 0.78rem; color: var(--ld-muted); }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.pill-warning { background: #FBF3DC; color: #8A6100; }
+.pill-success { background: #E8F5EE; color: #1E7B4F; }
+.pill-danger { background: #FDECEA; color: #B42318; }
+.pill-slate { background: #EEF1F4; color: #6B7A8A; }
+
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--ld-muted);
+  font-size: 0.9rem;
+}
+
+/* Tarjetas móviles */
+.order-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.order-card {
+  background: var(--ld-card);
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 14px;
+}
+.order-card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #F3F4F6;
+}
+.order-card-grid .lbl {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--ld-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.order-card-grid .val {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--ld-text);
+  font-weight: 500;
+}

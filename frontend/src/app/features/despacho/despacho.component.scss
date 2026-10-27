@@ -1,0 +1,236 @@
+.eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--ld-muted);
+  font-weight: 600;
+}
+.page-title {
+  font-size: 1.7rem;
+  font-weight: 400;
+  color: var(--ld-text);
+  margin-bottom: 4px;
+}
+.page-subtitle {
+  color: var(--ld-muted);
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.section-h {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ld-text);
+}
+
+.move-banner {
+  background: #E8F5EE;
+  border: 1px solid #c6e6d4;
+  color: #1E7B4F;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 0.86rem;
+}
+
+.kpi-card {
+  background: var(--ld-card);
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 16px;
+  height: 100%;
+}
+.kpi-label {
+  font-size: 0.72rem;
+  color: var(--ld-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+.kpi-value {
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: var(--ld-text);
+  margin-bottom: 4px;
+}
+.valor-transito { color: var(--ld-warning); }
+.valor-ok { color: var(--ld-success); }
+.kpi-note { font-size: 0.75rem; color: var(--ld-muted); }
+
+.filter-bar {
+  background: var(--ld-card);
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 12px;
+}
+.filter-select {
+  width: auto;
+  min-width: 150px;
+  border-radius: 8px;
+  font-size: 0.86rem;
+}
+
+/* Tarjetas de despacho */
+.ship-card {
+  background: var(--ld-card);
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 18px;
+  height: 100%;
+}
+.ship-card.ship-open {
+  border-color: var(--ld-gold);
+}
+
+.ship-codigo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ld-text);
+  font-family: monospace;
+}
+.ship-cliente {
+  font-size: 0.88rem;
+  color: var(--ld-text);
+  margin-top: 4px;
+}
+.ship-destino {
+  font-size: 0.78rem;
+  color: var(--ld-muted);
+}
+
+.ship-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+  padding-top: 12px;
+  border-top: 1px solid #F3F4F6;
+}
+.ship-grid .lbl {
+  display: block;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ld-muted);
+}
+.ship-grid .val {
+  display: block;
+  font-size: 0.86rem;
+  color: var(--ld-text);
+  font-weight: 500;
+}
+
+/* Detalle */
+.ship-detail {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed #E5E7EB;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.detail-block {
+  background: #F9FAFB;
+  border: 1px solid #F3F4F6;
+  border-radius: 10px;
+  padding: 14px;
+}
+.detail-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ld-text);
+  margin-bottom: 10px;
+}
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.82rem;
+  padding: 5px 0;
+  color: var(--ld-muted);
+}
+.detail-row strong {
+  color: var(--ld-text);
+  font-weight: 600;
+  text-align: right;
+}
+.doc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.84rem;
+  color: var(--ld-text);
+  padding: 6px 0;
+}
+
+/* Píldoras */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pill-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.pill-warning { background: #FBF3DC; color: #8A6100; }
+.pill-success { background: #E8F5EE; color: #1E7B4F; }
+.pill-danger { background: #FDECEA; color: #B42318; }
+.pill-slate { background: #EEF1F4; color: #6B7A8A; }
+
+/* Tabla */
+.ld-card {
+  background: var(--ld-card);
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.ld-table { font-size: 0.86rem; }
+.ld-table thead th {
+  background: #F9FAFB;
+  color: var(--ld-muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  border-bottom: 1px solid #E5E7EB;
+  padding: 12px 20px;
+}
+.ld-table tbody td {
+  padding: 13px 20px;
+  border-bottom: 1px solid #F3F4F6;
+  color: var(--ld-text);
+}
+.cell-strong { font-weight: 600; color: var(--ld-text); }
+.cell-muted { font-size: 0.78rem; color: var(--ld-muted); }
+
+/* Historial tarjetas móviles */
+.hist-cards { display: flex; flex-direction: column; gap: 10px; }
+.hist-card {
+  background: var(--ld-card);
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 12px;
+}
+.hist-meta {
+  display: flex;
+  gap: 14px;
+  margin-top: 8px;
+  font-size: 0.78rem;
+  color: var(--ld-muted);
+}
+
+.btn-ld-gold {
+  background: var(--ld-gold);
+  border: none;
+  color: #1B1D21;
+  font-weight: 600;
+}
+.btn-ld-gold:hover { background: #c49a2b; color: #1B1D21; }
+
+@media (max-width: 767.98px) {
+  .filter-select {
+    flex: 1;
+    min-width: 140px;
+  }
+}

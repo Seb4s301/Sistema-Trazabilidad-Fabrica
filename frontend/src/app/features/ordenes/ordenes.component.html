@@ -1,0 +1,88 @@
+<div class="page-header d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+  <div>
+    <div class="eyebrow mb-1">ÓRDENES DE FABRICACIÓN</div>
+    <h1 class="page-title">Órdenes</h1>
+    <p class="page-subtitle">Gestiona y consulta las órdenes de producción.</p>
+  </div>
+  <a routerLink="/ordenes/nueva" class="btn btn-ld-gold">+ Nueva orden</a>
+</div>
+
+<!-- Filtros -->
+<div class="filter-bar d-flex flex-wrap gap-2 mb-4">
+  <input type="text" class="form-control search-input" placeholder="Buscar por orden o modelo">
+
+  <select class="form-select filter-select" [(ngModel)]="filtroEstado">
+    <option value="">Todos los estados</option>
+    <option value="borrador">Borrador</option>
+    <option value="pendiente_corte">Pendiente de corte</option>
+    <option value="en_proceso">En proceso</option>
+    <option value="calidad">En calidad</option>
+    <option value="listo_despacho">Listo para despacho</option>
+  </select>
+
+  <select class="form-select filter-select" [(ngModel)]="filtroPrioridad">
+    <option value="">Toda prioridad</option>
+    <option value="Alta">Alta</option>
+    <option value="Normal">Normal</option>
+    <option value="Baja">Baja</option>
+  </select>
+</div>
+
+<!-- Tabla (escritorio) -->
+<div class="card ld-card d-none d-md-block">
+  <div class="table-responsive">
+    <table class="table ld-table align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Orden</th>
+          <th>Modelo</th>
+          <th>Cantidad</th>
+          <th>Prioridad</th>
+          <th>Estado</th>
+          <th>Lote</th>
+          <th>Entrega</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let o of ordenesFiltradas">
+          <td class="cell-strong">{{ o.numero }}</td>
+          <td>
+            <div>{{ o.modelo }}</div>
+            <div class="cell-muted">{{ o.categoria }}</div>
+          </td>
+          <td>{{ o.cantidad }}</td>
+          <td><span class="pill" [ngClass]="clasePrioridad(o.prioridad)"><span class="pill-dot"></span>{{ o.prioridad }}</span></td>
+          <td><span class="pill" [ngClass]="'pill-' + estadoDe(o).clase"><span class="pill-dot"></span>{{ estadoDe(o).label }}</span></td>
+          <td class="cell-muted">{{ o.lote }}</td>
+          <td>{{ o.entrega }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="ordenesFiltradas.length === 0" class="empty-state">
+    <p>Sin órdenes para este filtro</p>
+  </div>
+</div>
+
+<!-- Tarjetas (móvil) -->
+<div class="order-cards d-md-none">
+  <div class="order-card" *ngFor="let o of ordenesFiltradas">
+    <div class="order-card-top d-flex justify-content-between align-items-start">
+      <div>
+        <div class="cell-strong">{{ o.numero }}</div>
+        <div class="cell-muted">{{ o.modelo }} · {{ o.categoria }}</div>
+      </div>
+      <span class="pill" [ngClass]="'pill-' + estadoDe(o).clase"><span class="pill-dot"></span>{{ estadoDe(o).label }}</span>
+    </div>
+    <div class="order-card-grid">
+      <div><span class="lbl">Cantidad</span><span class="val">{{ o.cantidad }}</span></div>
+      <div><span class="lbl">Prioridad</span><span class="val">{{ o.prioridad }}</span></div>
+      <div><span class="lbl">Lote</span><span class="val">{{ o.lote }}</span></div>
+      <div><span class="lbl">Entrega</span><span class="val">{{ o.entrega }}</span></div>
+    </div>
+  </div>
+  <div *ngIf="ordenesFiltradas.length === 0" class="empty-state text-center">
+    <p>Sin órdenes para este filtro</p>
+  </div>
+</div>

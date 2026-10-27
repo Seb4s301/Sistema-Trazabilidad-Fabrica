@@ -1,0 +1,152 @@
+.eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--ld-muted);
+  font-weight: 600;
+}
+.page-title {
+  font-size: 1.7rem;
+  font-weight: 400;
+  color: var(--ld-text);
+  margin-bottom: 4px;
+}
+.page-subtitle {
+  color: var(--ld-muted);
+  font-size: 0.88rem;
+  margin: 0;
+  max-width: 720px;
+}
+
+.kpi-card {
+  background: var(--ld-card);
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 16px;
+  height: 100%;
+}
+.kpi-label {
+  font-size: 0.72rem;
+  color: var(--ld-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+.kpi-value {
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: var(--ld-text);
+  margin-bottom: 6px;
+}
+.kpi-note { font-size: 0.75rem; }
+.note-warning { color: var(--ld-warning); }
+.note-muted { color: var(--ld-muted); }
+
+.ld-card {
+  background: var(--ld-card);
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.card-header {
+  background: transparent;
+  border-bottom: 1px solid #E5E7EB;
+  padding: 16px 20px;
+}
+.card-title { font-size: 1rem; font-weight: 600; color: var(--ld-text); }
+.muted-small { font-size: 0.74rem; color: var(--ld-muted); }
+
+.ld-table { font-size: 0.86rem; }
+.ld-table thead th {
+  background: #F9FAFB;
+  color: var(--ld-muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  border-bottom: 1px solid #E5E7EB;
+  padding: 12px 20px;
+}
+.ld-table tbody td {
+  padding: 13px 20px;
+  border-bottom: 1px solid #F3F4F6;
+  color: var(--ld-text);
+}
+.cell-strong { font-weight: 600; color: var(--ld-text); }
+
+.ld-table tfoot td {
+  padding: 14px 20px;
+  background: #F9FAFB;
+  font-weight: 700;
+}
+.foot-total { text-align: right; color: var(--ld-muted); }
+.foot-amount { color: var(--ld-text); }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pill-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.pill-warning { background: #FBF3DC; color: #8A6100; }
+.pill-success { background: #E8F5EE; color: #1E7B4F; }
+.pill-slate { background: #EEF1F4; color: #6B7A8A; }
+
+/* Tarjetas móviles */
+.comision-cards { display: flex; flex-direction: column; gap: 12px; padding: 12px; }
+.comision-card {
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 12px;
+  background: #FAFAFA;
+}
+.cc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+.cc-grid .lbl {
+  display: block;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ld-muted);
+}
+.cc-grid .val { display: block; font-size: 0.9rem; color: var(--ld-text); }
+.cc-grid .val.strong { font-weight: 700; }
+
+/* Barras horizontales */
+.hbar-row {
+  display: grid;
+  grid-template-columns: 130px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.hbar-label { font-size: 0.82rem; color: var(--ld-text); }
+.hbar-track {
+  background: #F3F4F6;
+  border-radius: 999px;
+  height: 22px;
+  overflow: hidden;
+}
+.hbar-fill {
+  background: var(--ld-gold);
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.5s;
+}
+.hbar-fill.fill-slate { background: var(--ld-slate); }
+.hbar-value { font-size: 0.82rem; font-weight: 600; color: var(--ld-text); }
+
+@media (max-width: 575.98px) {
+  .hbar-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
