@@ -1,0 +1,13 @@
+<aside class="sidebar bg-dark text-white">
+  <div class="sidebar-brand p-3 text-center">
+    <span class="fw-bold" style="font-size:1.25rem;color:#D4A935;">LD</span>
+  </div>
+  <nav class="nav flex-column p-3">
+    <a *ngFor="let item of menu" [routerLink]="item.path" routerLinkActive="active"
+       class="nav-link text-decoration-none text-white-50 d-flex align-items-center px-3 py-2 rounded"
+       [class.active]="isActive(item.path)">
+      <i class="bi me-2" [attr.class]="'bi ' + item.icon"></i>
+      {{ item.label }}
+    </a>
+  </nav>
+</aside>
