@@ -6,6 +6,7 @@ ERP de producción web para una fábrica de colchones en Lima (interfaz en espa�
 
 - **Frontend:** Angular + Bootstrap (responsive: escritorio y móvil).
 - **Backend:** Spring Boot (Java), JWT, Spring Security.
+- **Backend runtime:** Java 25 LTS; Spring Boot 3.5.16.
 - **Base de datos:** PostgreSQL en Supabase (esquema en `schema.sql`).
 - **Prefijo API:** `/api/v1`
 - **Zona horaria:** `America/Lima`.
@@ -51,6 +52,16 @@ sistema-trazabilidad-fabrica/
 ├── docker-compose.yml            # (opcional) Supabase local / servicios
 ├── .gitignore
 └── README.md
+```
+
+## Backend: compilación y pruebas
+
+El backend requiere JDK 25 y Maven 3.9 o posterior. Desde la raíz del
+repositorio:
+
+```powershell
+cd backend
+mvn clean test
 ```
 
 ## Convenciones

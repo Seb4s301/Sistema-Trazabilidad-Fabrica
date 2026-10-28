@@ -1,14 +1,20 @@
 spring:
   application:
     name: erp-produccion
+  config:
+    # Carga el .env de la raíz del repo (o el de backend/) como propiedades.
+    # Así "mvn spring-boot:run" usa DB_URL, DB_USER, etc. sin exportarlas a mano.
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:../.env[.properties]
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/latin_dream?sslmode=require}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/postgres}
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: ${JPA_DDL_AUTO:validate}
     show-sql: true
     properties:
       hibernate:
@@ -38,7 +44,6 @@ app:
 
 # Semilla de usuarios de prueba (SOLO DESARROLLO)
 # Se crea solo si la tabla usuarios está vacía. En producción: enabled: false
-app:
   seed:
     enabled: ${APP_SEED_ENABLED:true}
     password: ${APP_SEED_PASSWORD:Latin2026!}

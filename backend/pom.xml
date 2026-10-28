@@ -15,21 +15,23 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.5</version>
+        <version>3.5.16</version>
         <relativePath/>
     </parent>
 
     <properties>
+        <!--
+          El proyecto se ejecuta con JDK 17 (el que está configurado en el IDE
+          y en el PATH). Se fuerza release 17 para que, aunque se compile con
+          un JDK más nuevo, el bytecode siga siendo compatible con JDK 17.
+        -->
         <java.version>17</java.version>
+        <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <postgresql.version>42.6.0</postgresql.version>
         <jjwt.version>0.12.3</jjwt.version>
-        <spring-boot.version>3.2.5</spring-boot.version>
-        <!--
-          Spring Boot 3.2.5 trae Lombok 1.18.30 (solo hasta JDK 21).
-          Se sobreescribe a la última para que compile en JDK 25/26/27
-          (si no, falla con: ExceptionInInitializerError: TypeTag :: UNKNOWN).
-        -->
+        <spring-boot.version>3.5.16</spring-boot.version>
+        <!-- Lombok reciente: compatible con JDK 17 y superiores. -->
         <lombok.version>1.18.48</lombok.version>
     </properties>
 
