@@ -8,12 +8,12 @@ import { DespachosService, Despacho } from '../../core/services/despachos.servic
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="modal-backdrop" *ngIf="visible" (click)="cerrar()"></div>
-    <div class="modal-panel" *ngIf="visible" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h5 class="modal-title">Cambiar estado de despacho</h5>
-        <button class="modal-close" (click)="cerrar()">✕</button>
-      </div>
+    <div class="modal-backdrop" *ngIf="visible" (click)="cerrar()">
+      <div class="modal-panel" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h5 class="modal-title">Cambiar estado de despacho</h5>
+          <button class="modal-close" (click)="cerrar()">✕</button>
+        </div>
       <div class="modal-body">
         <div class="form-group">
           <label class="form-label">Despacho</label>
@@ -37,9 +37,10 @@ import { DespachosService, Despacho } from '../../core/services/despachos.servic
           </select>
         </div>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline-secondary" (click)="cerrar()">Cancelar</button>
-        <button class="btn btn-ld-gold" (click)="guardar()" [disabled]="guardando">Guardar cambios</button>
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" (click)="cerrar()">Cancelar</button>
+          <button class="btn btn-ld-gold" (click)="guardar()" [disabled]="guardando">Guardar cambios</button>
+        </div>
       </div>
     </div>
   `,
@@ -47,12 +48,13 @@ import { DespachosService, Despacho } from '../../core/services/despachos.servic
     .modal-backdrop {
       position: fixed; inset: 0; background: rgba(0,0,0,0.5);
       display: flex; align-items: center; justify-content: center;
+      padding: 1rem; overflow-y: auto;
       z-index: 1050; backdrop-filter: blur(2px);
     }
     .modal-panel {
       background: #fff; border-radius: 12px; width: 100%; max-width: 480px;
       max-height: 90vh; overflow: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      animation: modalIn 0.25s ease-out;
+      animation: modalIn 0.25s ease-out; position: relative; z-index: 1051;
     }
     @keyframes modalIn {
       from { opacity: 0; transform: translateY(-20px); }

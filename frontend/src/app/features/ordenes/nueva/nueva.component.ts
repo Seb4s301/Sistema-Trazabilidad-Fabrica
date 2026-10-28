@@ -76,8 +76,17 @@ export class NuevaOrdenComponent {
     return this.rellenos.find(r => r.id === this.rellenoId);
   }
 
+  /** Campos que pertenecen al paso 1 (Producto). */
+  get esPaso1Completo(): boolean {
+    return this.modeloId !== null &&
+           this.dimensionId !== null &&
+           this.rellenoId !== null &&
+           this.cantidad !== null && this.cantidad >= 1;
+  }
+
   get esBorradorValido(): boolean {
-    return this.modeloId !== null;
+    // El backend exige todos los datos para poder persistir el borrador.
+    return this.esCompleto;
   }
 
   get esCompleto(): boolean {
@@ -122,8 +131,20 @@ export class NuevaOrdenComponent {
   }
 
   guardarBorrador(): void {
+    if (this.guardando || !this.esBorradorValido) return;
+
     this.guardando = true;
-    setTimeout(() => this.guardando = false, 800);
+    this.ordenesService.guardarBorrador(this.construirRequest()).subscribe({
+      next: (orden) => {
+        this.guardando = false;
+        this.numeroOrden = orden.numero;
+        alert('Borrador guardado: ' + orden.numero);
+      },
+      error: (err) => {
+        this.guardando = false;
+        alert(this.mensajeError(err, 'No se pudo guardar el borrador.'));
+      }
+    });
   }
 
   crearOrden(): void {
@@ -131,7 +152,20 @@ export class NuevaOrdenComponent {
 
     this.guardando = true;
 
-    const request: OrdenCreateRequest = {
+    this.ordenesService.crearOrden(this.construirRequest()).subscribe({
+      next: () => {
+        this.guardando = false;
+        this.router.navigate(['/ordenes']);
+      },
+      error: (err) => {
+        this.guardando = false;
+        alert(this.mensajeError(err, 'No se pudo crear la orden.'));
+      }
+    });
+  }
+
+  private construirRequest(): OrdenCreateRequest {
+    return {
       modelo_id: this.modeloId!,
       dimension_id: this.dimensionId!,
       relleno_id: this.rellenoId!,
@@ -141,18 +175,10 @@ export class NuevaOrdenComponent {
       observaciones: this.observaciones,
       turno: this.turno
     };
+  }
 
-    this.ordenesService.crearOrden(request).subscribe({
-      next: () => {
-        this.guardando = false;
-        this.router.navigate(['/ordenes']);
-      },
-      error: () => {
-        // Fallback: simular éxito si el backend no responde
-        this.guardando = false;
-        this.router.navigate(['/ordenes']);
-      }
-    });
+  private mensajeError(err: any, porDefecto: string): string {
+    return err?.error?.mensaje || porDefecto;
   }
 
   cancelar(): void {

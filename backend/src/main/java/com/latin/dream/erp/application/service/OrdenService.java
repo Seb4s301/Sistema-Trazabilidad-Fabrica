@@ -64,7 +64,8 @@ public class OrdenService {
             .orElseThrow(() -> new BusinessException("MODELO_NO_ENCONTRADO", "El modelo seleccionado no existe"));
 
         Orden orden = Orden.builder()
-            .numero("BORRADOR-" + System.currentTimeMillis())
+            // La columna numero es VARCHAR(20): "BORR-" + timestamp = 18 caracteres.
+            .numero("BORR-" + System.currentTimeMillis())
             .modelo(modelo)
             .cantidad(request.getCantidad())
             .prioridad(request.getPrioridad())

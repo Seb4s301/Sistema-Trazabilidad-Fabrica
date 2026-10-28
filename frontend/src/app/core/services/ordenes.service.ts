@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, switchMap } from 'rxjs';
 import { ENDPOINTS } from '../api.config';
 
 export interface Orden {
@@ -87,8 +87,36 @@ export class OrdenesService {
     return this.http.get<Orden>(`${ENDPOINTS.ordenes}/${id}`);
   }
 
+  /**
+   * El backend trabaja en dos pasos: primero guarda el borrador y luego
+   * confirma la orden (genera número OP-XXXX-NNNN y su lote).
+   */
   crearOrden(data: OrdenCreateRequest): Observable<Orden> {
-    return this.http.post<Orden>(ENDPOINTS.ordenes, data);
+    return this.http
+      .post<{ id: string }>(`${ENDPOINTS.ordenes}/borrador`, this.toBackendPayload(data))
+      .pipe(
+        switchMap(borrador =>
+          this.http.post<Orden>(`${ENDPOINTS.ordenes}/${borrador.id}/crear`, {})
+        )
+      );
+  }
+
+  guardarBorrador(data: OrdenCreateRequest): Observable<Orden> {
+    return this.http.post<Orden>(
+      `${ENDPOINTS.ordenes}/borrador`,
+      this.toBackendPayload(data)
+    );
+  }
+
+  /** Traduce los campos del formulario al DTO que espera Spring Boot. */
+  private toBackendPayload(data: OrdenCreateRequest) {
+    return {
+      modeloId: data.modelo_id,
+      cantidad: data.cantidad,
+      prioridad: data.prioridad,
+      fechaEntrega: data.fecha_entrega,
+      observaciones: data.observaciones ?? ''
+    };
   }
 
   actualizarOrden(id: string, data: Partial<Orden>): Observable<Orden> {

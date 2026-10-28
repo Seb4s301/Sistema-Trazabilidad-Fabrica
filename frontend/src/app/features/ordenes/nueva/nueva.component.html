@@ -184,7 +184,7 @@
         </button>
 
         <button class="btn btn-outline-dark" *ngIf="paso < 3" (click)="siguiente()"
-                [disabled]="(paso === 1 && !esCompleto) || (paso === 2 && (!fechaEntrega || !prioridad))">
+                [disabled]="(paso === 1 && !esPaso1Completo) || (paso === 2 && (!fechaEntrega || !prioridad))">
           Siguiente
         </button>
 
