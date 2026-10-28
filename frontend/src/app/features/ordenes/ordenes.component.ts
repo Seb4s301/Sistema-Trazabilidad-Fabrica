@@ -1,23 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { OrdenesService, Orden, OrdenFiltros } from '../../core/services/ordenes.service';
 
 @Component({
   selector: 'app-ordenes',
   templateUrl: './ordenes.component.html',
   styleUrls: ['./ordenes.component.scss']
 })
-export class OrdenesComponent {
+export class OrdenesComponent implements OnInit {
+
+  private ordenesService = inject(OrdenesService);
 
   filtroEstado = '';
   filtroPrioridad = '';
 
-  ordenes = [
-    { numero: 'OP-2026-0420', modelo: 'Comfort Plus', categoria: 'Queen', cantidad: 120, prioridad: 'Alta', estado: 'pendiente_corte', entrega: '24 oct. 2026', lote: 'LT-2610-0420' },
-    { numero: 'OP-2026-0419', modelo: 'Dream Rest', categoria: 'King', cantidad: 80, prioridad: 'Normal', estado: 'en_proceso', entrega: '22 oct. 2026', lote: 'LT-2610-0419' },
-    { numero: 'OP-2026-0418', modelo: 'Comfort Plus', categoria: 'Queen', cantidad: 150, prioridad: 'Alta', estado: 'en_proceso', entrega: '20 oct. 2026', lote: 'LT-2610-0418' },
-    { numero: 'OP-2026-0417', modelo: 'Eco Sleep', categoria: '2 Plazas', cantidad: 60, prioridad: 'Baja', estado: 'calidad', entrega: '18 oct. 2026', lote: 'LT-2610-0417' },
-    { numero: 'OP-2026-0416', modelo: 'Premium Rest', categoria: '1.5 Plazas', cantidad: 45, prioridad: 'Normal', estado: 'listo_despacho', entrega: '17 oct. 2026', lote: 'LT-2610-0416' },
-    { numero: 'OP-2026-0415', modelo: 'Dream Rest', categoria: 'King', cantidad: 200, prioridad: 'Normal', estado: 'borrador', entrega: '30 oct. 2026', lote: '—' }
-  ];
+  ordenes: Orden[] = [];
+  cargando = false;
 
   estados: Record<string, { label: string; clase: string }> = {
     borrador: { label: 'Borrador', clase: 'slate' },
@@ -29,6 +26,29 @@ export class OrdenesComponent {
     cancelado: { label: 'Cancelado', clase: 'danger' }
   };
 
+  ngOnInit(): void {
+    this.cargarOrdenes();
+  }
+
+  cargarOrdenes(): void {
+    this.cargando = true;
+    const filtros: OrdenFiltros = {};
+    if (this.filtroEstado) filtros.estado = this.filtroEstado;
+    if (this.filtroPrioridad) filtros.prioridad = this.filtroPrioridad;
+
+    this.ordenesService.getOrdenes(filtros).subscribe({
+      next: (data) => {
+        this.ordenes = data;
+        this.cargando = false;
+      },
+      error: () => {
+        // Fallback a datos demo si el backend no responde
+        this.ordenes = this.ordenesService.getDemoOrdenes();
+        this.cargando = false;
+      }
+    });
+  }
+
   get ordenesFiltradas() {
     return this.ordenes.filter(o =>
       (!this.filtroEstado || o.estado === this.filtroEstado) &&
@@ -36,7 +56,7 @@ export class OrdenesComponent {
     );
   }
 
-  estadoDe(orden: any) {
+  estadoDe(orden: Orden) {
     return this.estados[orden.estado] ?? { label: orden.estado, clase: 'slate' };
   }
 
@@ -44,5 +64,13 @@ export class OrdenesComponent {
     if (p === 'Alta') return 'pill-danger';
     if (p === 'Normal') return 'pill-slate';
     return 'pill-slate';
+  }
+
+  onFiltroCambio(): void {
+    this.cargarOrdenes();
+  }
+
+  montoTexto(valor: number): string {
+    return '$' + valor.toLocaleString('es-PE', { minimumFractionDigits: 0 });
   }
 }

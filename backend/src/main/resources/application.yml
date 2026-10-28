@@ -40,7 +40,7 @@ api:
 # Orígenes permitidos para CORS (separados por coma). En producción: dominio del frontend
 app:
   cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200,http://127.0.0.1:4200}
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200,http://127.0.0.1:4200,http://localhost:4201,http://127.0.0.1:4201}
 
 # Semilla de usuarios de prueba (SOLO DESARROLLO)
 # Se crea solo si la tabla usuarios está vacía. En producción: enabled: false

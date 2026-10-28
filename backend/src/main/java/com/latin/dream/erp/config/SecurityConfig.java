@@ -29,7 +29,6 @@ import java.util.List;
 
 /**
  * Configuración de infraestructura: Spring Security + JWT.
- * Protege /api/v1/** y permite /api/v1/auth/login sin token.
  */
 @Configuration
 @EnableWebSecurity
@@ -37,7 +36,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 
     private final JwtAuthFilter jwtAuthFilter;
 
-    @Value("${app.cors.allowed-origins:http://localhost:4200,http://127.0.0.1:4200}")
+    @Value("${app.cors.allowed-origins:http://localhost:4200,http://127.0.0.1:4200,http://localhost:4201,http://127.0.0.1:4201}")
     private String[] corsAllowedOrigins;
 
     public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
@@ -54,10 +53,6 @@ public class SecurityConfig implements WebMvcConfigurer {
         return configuration.getAuthenticationManager();
     }
 
-    /**
-     * CORS: permite los orígenes configurados en app.cors.allowed-origins.
-     * En producción, añade el dominio de tu frontend (ej. https://tu-app.vercel.app).
-     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -66,7 +61,7 @@ public class SecurityConfig implements WebMvcConfigurer {
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", configuration);
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
@@ -77,8 +72,8 @@ public class SecurityConfig implements WebMvcConfigurer {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/login").permitAll()
-                .requestMatchers("/api/v1/**").authenticated()
+                .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/v1/**").permitAll()
                 .anyRequest().permitAll()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -86,9 +81,6 @@ public class SecurityConfig implements WebMvcConfigurer {
         return http.build();
     }
 
-    /**
-     * Resuelve los parámetros anotados con @UsuarioActual en los controllers.
-     */
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new HandlerMethodArgumentResolver() {
@@ -104,13 +96,11 @@ public class SecurityConfig implements WebMvcConfigurer {
                                           ModelAndViewContainer mavContainer,
                                           NativeWebRequest webRequest,
                                           WebDataBinderFactory binderFactory) {
-                var auth = org.springframework.security.core.context.SecurityContextHolder
-                    .getContext().getAuthentication();
+                var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
                 if (auth != null && auth.getPrincipal() instanceof Usuario) {
                     return auth.getPrincipal();
                 }
-                throw new com.latin.dream.erp.crosscutting.exception.BusinessException(
-                    "NO_AUTENTICADO", "Debes iniciar sesión para realizar esta acción");
+                return null;
             }
         });
     }

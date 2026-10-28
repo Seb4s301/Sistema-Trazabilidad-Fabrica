@@ -6,12 +6,17 @@
   </div>
 
   <div class="header-controls d-flex flex-wrap align-items-center gap-2">
-    <select class="form-select range-select" [(ngModel)]="periodoSeleccionado">
-      <option value="semana42">Semana 42 · 13–17 oct. 2026</option>
-      <option value="semana41">Semana 41 · 6–10 oct. 2026</option>
-    </select>
-    <span class="updated-note d-none d-lg-inline">{{ rangoActualizado }}</span>
-    <button type="button" class="btn btn-outline-dark">Exportar informe</button>
+    <div class="range-selector d-flex align-items-center gap-1">
+      <span class="range-icon">📅</span>
+      <select class="form-select range-select" [(ngModel)]="periodoSeleccionado" (change)="onPeriodoCambio()">
+        <option value="semana42">12–18 oct. 2026</option>
+        <option value="semana41">5–11 oct. 2026</option>
+      </select>
+    </div>
+    <span class="updated-note d-none d-lg-inline">Datos actualizados a las 10:42</span>
+    <button type="button" class="btn btn-outline-dark btn-sm">
+      <span>↓</span> Exportar informe
+    </button>
   </div>
 </div>
 
@@ -19,42 +24,37 @@
 <div class="kpi-grid row g-3 mb-4">
   <div class="col-6 col-lg-3" *ngFor="let k of kpis">
     <div class="kpi-card">
-      <div class="kpi-label">{{ k.etiqueta }}</div>
-      <div class="kpi-value">{{ k.valor }}</div>
+      <div class="kpi-label-row d-flex justify-content-between align-items-start">
+        <div class="kpi-label">{{ k.etiqueta }}</div>
+      </div>
+      <div class="kpi-value" [ngClass]="{'kpi-danger': k.notaTipo === 'danger'}">{{ k.valor }}</div>
       <div class="kpi-note" [ngClass]="'note-' + k.notaTipo">{{ k.nota }}</div>
     </div>
   </div>
 </div>
 
-<!-- Gráficos -->
+<!-- Gráficos con Chart.js -->
 <div class="row g-3 mb-4">
   <!-- Ritmo de producción -->
   <div class="col-12 col-xl-7">
     <div class="card ld-card h-100">
       <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0">Ritmo de producción</h5>
-          <div class="btn-group btn-group-sm">
-            <button type="button" class="btn" [class.active]="vistaGrafico==='dia'" (click)="vistaGrafico='dia'">Día</button>
-            <button type="button" class="btn" [class.active]="vistaGrafico==='semana'" (click)="vistaGrafico='semana'">Semana</button>
-          </div>
+        <div>
+          <h5 class="card-title mb-0">Ritmo de producción</h5>
+          <div class="chart-period">12–18 de octubre</div>
+        </div>
+        <div class="btn-group btn-group-sm">
+          <button type="button" class="btn" [class.active]="vistaGrafico==='dia'" (click)="cambiarVista('dia')">Día</button>
+          <button type="button" class="btn" [class.active]="vistaGrafico==='semana'" (click)="cambiarVista('semana')">Semana</button>
+        </div>
       </div>
       <div class="card-body">
-        <div class="bar-chart position-relative">
-          <!-- línea de meta -->
-          <div class="meta-line" [style.bottom.%]="(240 / maxRitmo) * 100">
-            <span class="meta-label">Meta diaria: 240</span>
-          </div>
-
-          <div class="bars d-flex align-items-end justify-content-around h-100">
-            <div class="bar-wrapper d-flex flex-column align-items-center" *ngFor="let r of ritmo">
-              <div class="bar"
-                   [class.bar-highlight]="r.destacado"
-                   [style.height.%]="alturaBarra(r.valor)">
-                <span class="bar-value">{{ r.valor }}</span>
-              </div>
-              <span class="bar-label">{{ r.dia }}</span>
-            </div>
-          </div>
+        <div class="chart-units-label">
+          <span class="chart-units-value">{{ kpis[0]?.valor }}</span>
+          <span class="chart-units-text">Unidades esta semana</span>
+        </div>
+        <div class="chart-wrapper" style="height: 260px;">
+          <canvas #chartRitmo></canvas>
         </div>
       </div>
     </div>
@@ -68,8 +68,9 @@
         <span class="muted-small">{{ totalOrdenesActivas }} órdenes activas</span>
       </div>
       <div class="card-body d-flex align-items-center justify-content-center gap-4 flex-wrap">
-        <div class="donut" [style.background]="donutStyle">
-          <div class="donut-hole">
+        <div class="donut-container" style="width: 140px; height: 140px; position: relative;">
+          <canvas #chartDonut></canvas>
+          <div class="donut-hole-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 2;">
             <span class="donut-total">{{ totalOrdenesActivas }}</span>
             <span class="donut-caption">activas</span>
           </div>
@@ -141,6 +142,6 @@
 
 <!-- Banner de alerta -->
 <div class="alert-banner d-flex flex-wrap justify-content-between align-items-center gap-2">
-  <span>⚠️ 2 lotes superaron su fecha de entrega y requieren seguimiento.</span>
+  <span>⚠️ 2 lotes superaron su fecha de entrega. Revisa OP-2026-0418 y OP-2026-0420 con los responsables de línea.</span>
   <a routerLink="/produccion" class="link-warning">Ir a producción →</a>
 </div>

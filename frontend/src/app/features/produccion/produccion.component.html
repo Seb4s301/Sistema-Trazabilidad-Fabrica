@@ -1,14 +1,21 @@
 <div class="page-header d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
   <div>
-    <div class="eyebrow mb-1">TRAZABILIDAD EN VIVO</div>
+    <div class="eyebrow mb-1">PRODUCCIÓN / TRAZABILIDAD</div>
     <h1 class="page-title">Cada lote, en su etapa.</h1>
     <p class="page-subtitle">Sigue el avance de las órdenes de fabricación en tiempo real.</p>
   </div>
   <a routerLink="/ordenes/nueva" class="btn btn-ld-gold">+ Nueva orden</a>
 </div>
 
+<!-- Estado de carga -->
+<div *ngIf="cargando" class="text-center py-4">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Cargando tablero...</span>
+  </div>
+</div>
+
 <!-- Métricas -->
-<div class="metric-strip row g-2 mb-4">
+<div class="metric-strip row g-2 mb-4" *ngIf="!cargando">
   <div class="col-6 col-lg-3" *ngFor="let m of metricas">
     <div class="metric-card" [class.metric-danger]="m.peligro">
       <div class="metric-label">{{ m.etiqueta }}</div>
@@ -18,29 +25,28 @@
 </div>
 
 <!-- Filtros -->
-<div class="filter-bar d-flex flex-wrap gap-2 mb-4">
+<div class="filter-bar d-flex flex-wrap gap-2 mb-4" *ngIf="!cargando">
   <input type="text" class="form-control search-input" placeholder="Buscar orden, lote o modelo"
-         [(ngModel)]="busqueda">
+         [(ngModel)]="busqueda" (input)="onFiltroCambio()">
 
-  <select class="form-select filter-select" [(ngModel)]="filtroPrioridad">
+  <select class="form-select filter-select" [(ngModel)]="filtroPrioridad" (change)="onFiltroCambio()">
     <option value="">Prioridad</option>
     <option value="Alta">Alta</option>
     <option value="Normal">Normal</option>
     <option value="Baja">Baja</option>
   </select>
 
-  <select class="form-select filter-select" [(ngModel)]="filtroResponsable">
+  <select class="form-select filter-select" [(ngModel)]="filtroResponsable" (change)="onFiltroCambio()">
     <option value="">Responsable</option>
     <option *ngFor="let r of responsables" [value]="r">{{ r }}</option>
   </select>
 
-  <select class="form-select filter-select" [(ngModel)]="filtroEntrega">
+  <select class="form-select filter-select" [(ngModel)]="filtroEntrega" (change)="onFiltroCambio()">
     <option value="">Entrega</option>
     <option value="retrasados">Con retraso</option>
     <option value="semana">Esta semana</option>
   </select>
 
-  <!-- Toggle vista -->
   <div class="view-toggle d-none d-md-flex">
     <button class="toggle-btn" [class.active]="vista==='tablero'" (click)="vista='tablero'">▦ Tablero</button>
     <button class="toggle-btn" [class.active]="vista==='lista'" (click)="vista='lista'">☰ Lista</button>
@@ -48,7 +54,7 @@
 </div>
 
 <!-- TABLERO (escritorio) -->
-<div class="kanban d-none d-md-flex" *ngIf="vista === 'tablero'">
+<div class="kanban d-none d-md-flex" *ngIf="vista === 'tablero' && !cargando">
   <div class="kanban-col" *ngFor="let area of areas">
     <div class="col-head">
       <span class="col-title">{{ area.nombre }}</span>
@@ -85,6 +91,10 @@
           </div>
           <span class="card-entrega" [class.delayed]="l.diasRetraso">{{ l.entrega }}</span>
         </div>
+
+        <button type="button" class="btn btn-ld-gold btn-sm w-100 mt-2" (click)="abrirModalAvance(l)">
+          Avanzar lote
+        </button>
       </div>
 
       <div class="col-empty" *ngIf="lotesFiltrados(area).length === 0">
@@ -95,7 +105,7 @@
 </div>
 
 <!-- LISTA (móvil / o vista lista) -->
-<div class="lista-vista d-md-none" *ngIf="vista === 'tablero' || vista === 'lista'">
+<div class="lista-vista d-md-none" *ngIf="(vista === 'tablero' || vista === 'lista') && !cargando">
   <div class="area-group" *ngFor="let area of areas">
     <div class="area-group-head d-flex justify-content-between align-items-center">
       <span>{{ area.nombre }} · {{ lotesFiltrados(area).length }} lotes</span>
@@ -121,12 +131,24 @@
         </div>
         <span class="card-entrega" [class.delayed]="l.diasRetraso">{{ l.entrega }}</span>
       </div>
+
+      <button type="button" class="btn btn-ld-gold btn-sm w-100 mt-2" (click)="abrirModalAvance(l)">
+        Avanzar lote
+      </button>
     </div>
   </div>
 </div>
 
 <!-- Pie -->
-<div class="board-footer d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">
+<div class="board-footer d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3" *ngIf="!cargando">
   <span class="total-line">{{ totalLotes }} lotes · {{ totalUnidades }} uds.</span>
   <span class="note-line">El avance de cada lote se registra con su responsable, fecha y resultado de control.</span>
 </div>
+
+<!-- Modal: Registrar avance de lote -->
+<app-avance-lote-modal
+  [visible]="modalAvanceVisible"
+  [lote]="loteSeleccionado"
+  (avanceRegistrado)="onAvanceRegistrado()"
+  (cerrado)="modalAvanceVisible = false">
+</app-avance-lote-modal>

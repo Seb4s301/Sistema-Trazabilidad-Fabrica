@@ -1,8 +1,14 @@
+/* ============================================================
+   Latin Dream · Órdenes — estilos pixel-perfect
+   ============================================================ */
+
+/* Encabezado de página */
 .eyebrow {
   font-size: 0.68rem;
   letter-spacing: 0.1em;
   color: var(--ld-muted);
   font-weight: 600;
+  text-transform: uppercase;
 }
 
 .page-title {
@@ -10,6 +16,7 @@
   font-weight: 400;
   color: var(--ld-text);
   margin-bottom: 4px;
+  line-height: 1.2;
 }
 
 .page-subtitle {
@@ -18,56 +25,145 @@
   margin: 0;
 }
 
+/* Botón dorado (+ Nueva orden) */
+.btn-ld-gold {
+  background-color: var(--ld-gold);
+  border: none;
+  color: #1B1D21;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-size: 0.88rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.15s ease-in-out, transform 0.1s ease;
+
+  &:hover {
+    background-color: #c49a2b;
+    color: #1B1D21;
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+/* Barra de filtros */
 .filter-bar {
   background: var(--ld-card);
-  border: 1px solid #E5E7EB;
+  border: 1px solid #E8E8E8;
   border-radius: 12px;
-  padding: 12px;
+  padding: 12px 16px;
+  align-items: center;
 }
 
 .search-input {
-  flex: 1;
-  min-width: 200px;
+  flex: 2;
+  min-width: 240px;
   border-radius: 8px;
+  border: 1px solid #E8E8E8;
   font-size: 0.86rem;
+  padding: 8px 14px;
+  background-color: #FFFFFF;
+  color: var(--ld-text);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &::placeholder {
+    color: #9CA3AF;
+  }
+
+  &:focus {
+    border-color: var(--ld-gold);
+    box-shadow: 0 0 0 3px rgba(212, 169, 53, 0.15);
+    outline: none;
+  }
 }
 
 .filter-select {
-  width: auto;
-  min-width: 160px;
+  flex: 1;
+  min-width: 170px;
+  max-width: 220px;
   border-radius: 8px;
+  border: 1px solid #E8E8E8;
   font-size: 0.86rem;
+  padding: 8px 32px 8px 12px;
+  background-color: #FFFFFF;
+  color: var(--ld-text);
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:focus {
+    border-color: var(--ld-gold);
+    box-shadow: 0 0 0 3px rgba(212, 169, 53, 0.15);
+    outline: none;
+  }
 }
 
+/* Spinner */
+.spinner-border.text-primary {
+  color: var(--ld-gold) !important;
+}
+
+/* Tarjeta contenedora de tabla */
 .ld-card {
   background: var(--ld-card);
-  border: 1px solid #E5E7EB;
+  border: 1px solid #E8E8E8;
   border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
+/* Tabla de órdenes */
 .ld-table {
+  width: 100%;
   font-size: 0.86rem;
+  margin-bottom: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+
+  thead th {
+    background: #F9FAFB;
+    color: var(--ld-muted);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    border-bottom: 1px solid #E8E8E8;
+    padding: 12px 20px;
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 14px 20px;
+    border-bottom: 1px solid #F3F4F6;
+    color: var(--ld-text);
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr:hover {
+    background-color: #FAFAFA;
+    transition: background-color 0.15s ease-in-out;
+  }
 }
-.ld-table thead th {
-  background: #F9FAFB;
-  color: var(--ld-muted);
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+
+.cell-strong {
   font-weight: 600;
-  border-bottom: 1px solid #E5E7EB;
-  padding: 12px 20px;
-}
-.ld-table tbody td {
-  padding: 14px 20px;
-  border-bottom: 1px solid #F3F4F6;
   color: var(--ld-text);
 }
 
-.cell-strong { font-weight: 600; color: var(--ld-text); }
-.cell-muted { font-size: 0.78rem; color: var(--ld-muted); }
+.cell-muted {
+  font-size: 0.78rem;
+  color: var(--ld-muted);
+}
 
+/* Píldoras de estado y prioridad */
 .pill {
   display: inline-flex;
   align-items: center;
@@ -77,23 +173,47 @@
   font-size: 0.74rem;
   font-weight: 600;
   white-space: nowrap;
+  line-height: 1.3;
 }
+
 .pill-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: currentColor;
+  background-color: currentColor;
+  flex-shrink: 0;
 }
-.pill-warning { background: #FBF3DC; color: #8A6100; }
-.pill-success { background: #E8F5EE; color: #1E7B4F; }
-.pill-danger { background: #FDECEA; color: #B42318; }
-.pill-slate { background: #EEF1F4; color: #6B7A8A; }
 
+.pill-warning {
+  background-color: #FBF3DC;
+  color: #8A6100;
+}
+
+.pill-success {
+  background-color: #E8F5EE;
+  color: #1E7B4F;
+}
+
+.pill-danger {
+  background-color: #FDECEA;
+  color: #B42318;
+}
+
+.pill-slate {
+  background-color: #EEF1F4;
+  color: #6B7A8A;
+}
+
+/* Estado vacío */
 .empty-state {
-  padding: 40px 20px;
+  padding: 48px 20px;
   text-align: center;
   color: var(--ld-muted);
   font-size: 0.9rem;
+
+  p {
+    margin: 0;
+  }
 }
 
 /* Tarjetas móviles */
@@ -102,30 +222,56 @@
   flex-direction: column;
   gap: 12px;
 }
+
 .order-card {
   background: var(--ld-card);
-  border: 1px solid #E5E7EB;
+  border: 1px solid #E8E8E8;
   border-radius: 12px;
-  padding: 14px;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
+
+.order-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
 .order-card-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-top: 12px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 14px;
   padding-top: 12px;
   border-top: 1px solid #F3F4F6;
+
+  .lbl {
+    display: block;
+    font-size: 0.68rem;
+    color: var(--ld-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 2px;
+  }
+
+  .val {
+    display: block;
+    font-size: 0.88rem;
+    color: var(--ld-text);
+    font-weight: 500;
+  }
 }
-.order-card-grid .lbl {
-  display: block;
-  font-size: 0.68rem;
-  color: var(--ld-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.order-card-grid .val {
-  display: block;
-  font-size: 0.88rem;
-  color: var(--ld-text);
-  font-weight: 500;
+
+/* Ajustes responsivos */
+@media (max-width: 575.98px) {
+  .search-input {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
+
+  .filter-select {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
 }

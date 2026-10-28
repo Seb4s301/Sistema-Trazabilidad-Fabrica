@@ -1,62 +1,56 @@
-import { Component } from '@angular/core';
-
-interface ComisionFila {
-  tipo: string;
-  modelo: string;
-  categoria: string;
-  unidades: number;
-  precioBase: number;
-  porcentaje: number;
-  monto: number;
-  estado: 'Pagado' | 'Pendiente' | 'En revisión';
-}
-
-interface Kpi {
-  etiqueta: string;
-  valor: string;
-  nota?: string;
-  notaTipo?: string;
-}
+import { Component, OnInit, inject } from '@angular/core';
+import { ComisionesService, ComisionesData, ComisionFila, DistribucionItem } from '../../core/services/comisiones.service';
 
 @Component({
   selector: 'app-comisiones',
   templateUrl: './comisiones.component.html',
   styleUrls: ['./comisiones.component.scss']
 })
-export class ComisionesComponent {
+export class ComisionesComponent implements OnInit {
 
-  kpis: Kpi[] = [
-    { etiqueta: 'Total comisiones del mes', valor: '$11.660', nota: 'Octubre 2026' },
-    { etiqueta: 'Comisiones pendientes de pago', valor: '$5.900', nota: 'incluye $1.500 en revisión', notaTipo: 'warning' },
-    { etiqueta: 'Modelo de mayor rendimiento', valor: '$4.560', nota: 'Comfort Plus · 2 categorías' },
-    { etiqueta: 'Promedio por unidad', valor: '$16,66', nota: '700 unidades' }
-  ];
+  private comisionesService = inject(ComisionesService);
 
-  filas: ComisionFila[] = [
-    { tipo: 'Modelo', modelo: 'Comfort Plus', categoria: 'Queen', unidades: 200, precioBase: 456, porcentaje: 5, monto: 4560, estado: 'Pendiente' },
-    { tipo: 'Modelo', modelo: 'Comfort Plus', categoria: '1.5 Plazas', unidades: 120, precioBase: 380, porcentaje: 5, monto: 2280, estado: 'Pendiente' },
-    { tipo: 'Modelo', modelo: 'Dream Rest', categoria: 'King', unidades: 80, precioBase: 560, porcentaje: 5, monto: 2240, estado: 'Pagado' },
-    { tipo: 'Modelo', modelo: 'Eco Sleep', categoria: '2 Plazas', unidades: 150, precioBase: 300, porcentaje: 4, monto: 1800, estado: 'En revisión' },
-    { tipo: 'Modelo', modelo: 'Premium Rest', categoria: '1.5 Plazas', unidades: 60, precioBase: 460, porcentaje: 5, monto: 1380, estado: 'Pagado' },
-    { tipo: 'Modelo', modelo: 'Eco Sleep', categoria: 'Queen', unidades: 50, precioBase: 400, porcentaje: 4, monto: 800, estado: 'Pendiente' }
-  ];
+  kpis: ComisionesData['kpis'] = [];
+  filas: ComisionFila[] = [];
+  barrasModelo: DistribucionItem[] = [];
+  barrasRelleno: DistribucionItem[] = [];
+  cargando = false;
 
-  // Distribución por modelo
-  distribucionModelo = [
-    { label: 'Comfort Plus', valor: 6840 },
-    { label: 'Dream Rest', valor: 2240 },
-    { label: 'Eco Sleep', valor: 2600 },
-    { label: 'Premium Rest', valor: 1380 }
-  ];
+  ngOnInit(): void {
+    this.cargarComisiones();
+  }
 
-  // Distribución por relleno
-  distribucionRelleno = [
-    { label: 'Resortes Ensacados', valor: 7180 },
-    { label: 'Memory Foam', valor: 5880 }
-  ];
+  cargarComisiones(): void {
+    this.cargando = true;
+    this.comisionesService.getComisiones().subscribe({
+      next: (data) => {
+        this.aplicarDatos(data);
+      },
+      error: () => {
+        this.aplicarDatos(this.comisionesService.getDemoData());
+      }
+    });
+  }
 
-  maxModelo = 7000;
-  maxRelleno = 8000;
+  private aplicarDatos(data: ComisionesData): void {
+    this.kpis = data.kpis;
+    this.filas = data.filas;
+    this.barrasModelo = data.distribucionModelo;
+    this.barrasRelleno = data.distribucionRelleno;
+    this.cargando = false;
+  }
+
+  get totalMonto(): number {
+    return this.filas.reduce((sum, f) => sum + f.monto, 0);
+  }
+
+  get totalModelo(): number {
+    return this.barrasModelo.reduce((sum, b) => sum + b.valor, 0);
+  }
+
+  get totalRelleno(): number {
+    return this.barrasRelleno.reduce((sum, b) => sum + b.valor, 0);
+  }
 
   get claseEstado(): Record<string, string> {
     return {
@@ -67,6 +61,25 @@ export class ComisionesComponent {
   }
 
   montoTexto(valor: number): string {
-    return '$' + valor.toLocaleString('es-PE', { minimumFractionDigits: 0 });
+    return this.comisionesService.montoTexto(valor);
+  }
+
+  exportarReporte(): void {
+    this.comisionesService.exportarReporteExcel().subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Reporte_Comisiones_LatinDream.xlsx';
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => console.error('Error al exportar reporte Excel', err)
+    });
+  }
+
+  porcentajeBarra(valor: number, total: number): number {
+    if (!total) return 0;
+    return Math.round((valor / total) * 100);
   }
 }

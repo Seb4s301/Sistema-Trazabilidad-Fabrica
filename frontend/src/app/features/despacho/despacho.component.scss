@@ -1,14 +1,23 @@
+/* ============================================================
+   Latin Dream · Despacho y Transporte — estilos pixel-perfect
+   ============================================================ */
+
+/* Header de página */
 .eyebrow {
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
   color: var(--ld-muted);
   font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: block;
 }
 .page-title {
-  font-size: 1.7rem;
+  font-size: 1.9rem;
   font-weight: 400;
   color: var(--ld-text);
   margin-bottom: 4px;
+  line-height: 1.2;
 }
 .page-subtitle {
   color: var(--ld-muted);
@@ -16,100 +25,160 @@
   margin: 0;
 }
 
-.section-h {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--ld-text);
-}
-
-.move-banner {
-  background: #E8F5EE;
-  border: 1px solid #c6e6d4;
-  color: #1E7B4F;
-  border-radius: 10px;
-  padding: 12px 18px;
-  font-size: 0.86rem;
-}
-
+/* KPI cards strip */
 .kpi-card {
-  background: var(--ld-card);
-  border: 1px solid #E5E7EB;
+  background: #fff;
+  border: 1px solid #E8E8E8;
   border-radius: 12px;
-  padding: 16px;
+  padding: 18px 20px;
   height: 100%;
 }
 .kpi-label {
   font-size: 0.72rem;
   color: var(--ld-muted);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   margin-bottom: 8px;
 }
 .kpi-value {
-  font-size: 1.7rem;
+  font-size: 2rem;
   font-weight: 600;
   color: var(--ld-text);
   margin-bottom: 4px;
+  line-height: 1.1;
+}
+.kpi-note {
+  font-size: 0.75rem;
+  color: var(--ld-muted);
 }
 .valor-transito { color: var(--ld-warning); }
 .valor-ok { color: var(--ld-success); }
-.kpi-note { font-size: 0.75rem; color: var(--ld-muted); }
 
-.filter-bar {
-  background: var(--ld-card);
-  border: 1px solid #E5E7EB;
+/* ============================================================
+   Panel de filtros (columna izquierda)
+   ============================================================ */
+.filter-panel {
+  background: #fff;
+  border: 1px solid #E8E8E8;
   border-radius: 12px;
-  padding: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
-.filter-select {
-  width: auto;
-  min-width: 150px;
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--ld-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.filter-panel .form-select,
+.filter-panel .form-control {
+  border: 1px solid #E8E8E8;
   border-radius: 8px;
-  font-size: 0.86rem;
+  font-size: 0.88rem;
+  color: var(--ld-text);
+  padding: 9px 12px;
+  background: #fff;
 }
-
-/* Tarjetas de despacho */
-.ship-card {
-  background: var(--ld-card);
-  border: 1px solid #E5E7EB;
-  border-radius: 12px;
-  padding: 18px;
-  height: 100%;
-}
-.ship-card.ship-open {
+.filter-panel .form-select:focus,
+.filter-panel .form-control:focus {
+  outline: none;
   border-color: var(--ld-gold);
+  box-shadow: 0 0 0 3px rgba(212,169,53,0.12);
 }
 
+.input-icon-wrap { position: relative; }
+.input-icon-right {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--ld-muted);
+  font-size: 0.9rem;
+}
+
+/* Botón aplicar filtros */
+.filter-panel .btn-ld-gold {
+  background: var(--ld-gold);
+  border: none;
+  color: #1B1D21;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-top: 4px;
+}
+.filter-panel .btn-ld-gold:hover { background: #c49a2b; }
+
+/* ============================================================
+   Panel de seguimiento (columna derecha)
+   ============================================================ */
+.tracking-panel {
+  background: #fff;
+  border: 1px solid #E8E8E8;
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+
+.section-h {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ld-text);
+}
+.muted-small { font-size: 0.76rem; color: var(--ld-muted); }
+
+/* Tarjeta de envío */
+.ship-card {
+  background: #fff;
+  border: 1px solid #E8E8E8;
+  border-radius: 12px;
+  padding: 18px 20px;
+  transition: border-color 0.15s;
+}
+.ship-card.ship-selected {
+  border-color: var(--ld-gold);
+  box-shadow: 0 0 0 3px rgba(212,169,53,0.10);
+}
 .ship-codigo {
   font-size: 1rem;
   font-weight: 700;
   color: var(--ld-text);
-  font-family: monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  letter-spacing: 0.02em;
 }
-.ship-cliente {
-  font-size: 0.88rem;
-  color: var(--ld-text);
-  margin-top: 4px;
-}
-.ship-destino {
+.ship-lote {
   font-size: 0.78rem;
   color: var(--ld-muted);
+  margin-top: 2px;
 }
-
 .ship-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: 10px;
-  margin: 14px 0;
-  padding-top: 12px;
+  padding-top: 14px;
   border-top: 1px solid #F3F4F6;
+  margin-top: 12px;
 }
 .ship-grid .lbl {
   display: block;
-  font-size: 0.66rem;
+  font-size: 0.63rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   color: var(--ld-muted);
+  margin-bottom: 3px;
 }
 .ship-grid .val {
   display: block;
@@ -118,50 +187,154 @@
   font-weight: 500;
 }
 
-/* Detalle */
-.ship-detail {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px dashed #E5E7EB;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+/* Botón ver detalle */
+.ship-card .btn-ld-gold {
+  background: var(--ld-gold);
+  border: none;
+  color: #1B1D21;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 12px;
 }
-.detail-block {
-  background: #F9FAFB;
-  border: 1px solid #F3F4F6;
-  border-radius: 10px;
-  padding: 14px;
+.ship-card .btn-ld-gold:hover { background: #c49a2b; }
+
+/* ============================================================
+   Detalle del despacho
+   ============================================================ */
+.despacho-detail {
+  background: #fff;
+  border: 1px solid #E8E8E8;
+  border-radius: 12px;
+  padding: 24px;
 }
+
 .detail-title {
-  font-size: 0.82rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--ld-text);
-  margin-bottom: 10px;
 }
-.detail-row {
+.detail-meta {
+  font-size: 0.78rem;
+  color: var(--ld-muted);
+  margin-top: 2px;
+}
+
+.detail-summary {
+  padding: 14px 0;
+  border-bottom: 1px solid #F3F4F6;
+  margin-bottom: 4px;
+}
+.detail-summary .lbl {
+  display: block;
+  font-size: 0.63rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ld-muted);
+  margin-bottom: 3px;
+}
+.detail-summary .val {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--ld-text);
+  font-weight: 500;
+}
+
+/* Bloques de detalle */
+.detail-block {
+  border: 1px solid #E8E8E8;
+  border-radius: 10px;
+  padding: 16px 20px;
+  background: #fff;
+  height: 100%;
+}
+.block-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ld-text);
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #F3F4F6;
+}
+.block-row {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
-  font-size: 0.82rem;
-  padding: 5px 0;
-  color: var(--ld-muted);
+  gap: 12px;
+  padding: 6px 0;
+  font-size: 0.84rem;
 }
-.detail-row strong {
-  color: var(--ld-text);
-  font-weight: 600;
-  text-align: right;
-}
+.block-row .lbl { color: var(--ld-muted); }
+.block-row .val { color: var(--ld-text); font-weight: 500; }
+
+/* Documentos */
 .doc-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 0.84rem;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #F3F4F6;
+}
+.doc-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.doc-icon { font-size: 1.3rem; color: var(--ld-muted); }
+.doc-name {
+  font-size: 0.88rem;
+  font-weight: 600;
   color: var(--ld-text);
-  padding: 6px 0;
+}
+.doc-meta {
+  font-size: 0.73rem;
+  color: var(--ld-muted);
+  margin-top: 2px;
 }
 
-/* Píldoras */
+.btn-icon-only {
+  background: none;
+  border: 1px solid #E8E8E8;
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--ld-muted);
+  transition: background 0.15s;
+  font-size: 0.9rem;
+}
+.btn-icon-only:hover { background: #F9FAFB; }
+
+/* Etiqueta */
+.etiqueta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 14px;
+  flex-wrap: wrap;
+}
+.etiqueta-preview { display: flex; flex-direction: column; gap: 3px; }
+.etiqueta-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ld-text);
+}
+.etiqueta-desc { font-size: 0.73rem; color: var(--ld-muted); }
+
+/* ============================================================
+   Píldoras de estado
+   ============================================================ */
 .pill {
   display: inline-flex;
   align-items: center;
@@ -173,15 +346,17 @@
   white-space: nowrap;
 }
 .pill-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.pill-warning { background: #FBF3DC; color: #8A6100; }
-.pill-success { background: #E8F5EE; color: #1E7B4F; }
-.pill-danger { background: #FDECEA; color: #B42318; }
-.pill-slate { background: #EEF1F4; color: #6B7A8A; }
+.pill-warning  { background: #FBF3DC; color: #8A6100; }
+.pill-success  { background: #E8F5EE; color: #1E7B4F; }
+.pill-danger   { background: #FDECEA; color: #B42318; }
+.pill-slate    { background: #EEF1F4; color: #6B7A8A; }
 
-/* Tabla */
+/* ============================================================
+   Tabla historial
+   ============================================================ */
 .ld-card {
-  background: var(--ld-card);
-  border: 1px solid #E5E7EB;
+  background: #fff;
+  border: 1px solid #E8E8E8;
   border-radius: 12px;
   overflow: hidden;
 }
@@ -191,26 +366,27 @@
   color: var(--ld-muted);
   font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   font-weight: 600;
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1px solid #E8E8E8;
   padding: 12px 20px;
 }
 .ld-table tbody td {
   padding: 13px 20px;
-  border-bottom: 1px solid #F3F4F6;
+  border-bottom: 1px solid #F5F5F5;
   color: var(--ld-text);
 }
+.ld-table tbody tr:last-child td { border-bottom: none; }
 .cell-strong { font-weight: 600; color: var(--ld-text); }
-.cell-muted { font-size: 0.78rem; color: var(--ld-muted); }
+.cell-muted  { font-size: 0.78rem; color: var(--ld-muted); }
 
-/* Historial tarjetas móviles */
+/* Historial tarjetas (móvil) */
 .hist-cards { display: flex; flex-direction: column; gap: 10px; }
 .hist-card {
-  background: var(--ld-card);
-  border: 1px solid #E5E7EB;
+  background: #fff;
+  border: 1px solid #E8E8E8;
   border-radius: 10px;
-  padding: 12px;
+  padding: 14px;
 }
 .hist-meta {
   display: flex;
@@ -220,17 +396,47 @@
   color: var(--ld-muted);
 }
 
+/* Banner de último movimiento */
+.move-banner {
+  background: #fff;
+  border: 1px solid #E8E8E8;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 0.82rem;
+  color: var(--ld-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Botón genérico outline */
+.btn-outline-dark {
+  background: transparent;
+  border: 1px solid #D0D0D0;
+  color: var(--ld-text);
+  font-size: 0.88rem;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 9px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-outline-dark:hover { background: #F5F5F5; }
+
+/* Botón gold contextual */
 .btn-ld-gold {
   background: var(--ld-gold);
   border: none;
   color: #1B1D21;
   font-weight: 600;
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-size: 0.88rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s;
 }
 .btn-ld-gold:hover { background: #c49a2b; color: #1B1D21; }
-
-@media (max-width: 767.98px) {
-  .filter-select {
-    flex: 1;
-    min-width: 140px;
-  }
-}
+.btn-icon { font-size: 0.85rem; }

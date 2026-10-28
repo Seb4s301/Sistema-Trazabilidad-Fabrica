@@ -7,7 +7,7 @@
 }
 
 .main-content {
-  margin-left: 248px; /* ancho del sidebar */
+  margin-left: 160px; /* ancho del sidebar compacto */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -22,7 +22,7 @@
 
 .page-body {
   flex: 1 0 auto;
-  padding: 24px 32px;
+  padding: 28px 32px;
   background: var(--ld-bg);
 }
 

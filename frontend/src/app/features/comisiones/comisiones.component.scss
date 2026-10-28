@@ -1,152 +1,379 @@
+/* ==========================================================================
+   COMISIONES POR PRODUCTO
+   Latin Dream - Gestión Industrial
+   ========================================================================== */
+
+// --- Tokens Locales ---
+$gold-primary: #D4A935;
+$gold-hover: #C49A2B;
+$gold-text: #1B1D21;
+$amber-bg: #FBF3DC;
+$amber-text: #8A6100;
+$slate-bg: #EEF1F4;
+$slate-text: #6B7A8A;
+$success-bg: #E8F5EE;
+$success-text: #1E7B4F;
+$border-color: #E5E7EB;
+$card-bg: #FFFFFF;
+$text-main: #1F2328;
+$text-muted: #6B7280;
+
+// --- Cabecera de Página ---
+.page-header {
+  margin-bottom: 24px;
+}
+
 .eyebrow {
   font-size: 0.68rem;
-  letter-spacing: 0.1em;
-  color: var(--ld-muted);
+  letter-spacing: 0.08em;
+  color: $text-muted;
   font-weight: 600;
+  text-transform: uppercase;
 }
+
 .page-title {
-  font-size: 1.7rem;
-  font-weight: 400;
-  color: var(--ld-text);
+  font-size: 1.85rem;
+  font-weight: 500;
+  color: $text-main;
   margin-bottom: 4px;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
+
 .page-subtitle {
-  color: var(--ld-muted);
-  font-size: 0.88rem;
+  color: $text-muted;
+  font-size: 0.9rem;
   margin: 0;
-  max-width: 720px;
+  max-width: 740px;
+  line-height: 1.4;
 }
 
-.kpi-card {
-  background: var(--ld-card);
-  border: 1px solid #E5E7EB;
-  border-radius: 12px;
-  padding: 16px;
-  height: 100%;
-}
-.kpi-label {
-  font-size: 0.72rem;
-  color: var(--ld-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 8px;
-}
-.kpi-value {
-  font-size: 1.7rem;
+// Botón de exportación dorado
+.btn-ld-gold {
+  background-color: $gold-primary;
+  border: none;
+  color: $gold-text;
   font-weight: 600;
-  color: var(--ld-text);
-  margin-bottom: 6px;
-}
-.kpi-note { font-size: 0.75rem; }
-.note-warning { color: var(--ld-warning); }
-.note-muted { color: var(--ld-muted); }
-
-.ld-card {
-  background: var(--ld-card);
-  border: 1px solid #E5E7EB;
-  border-radius: 12px;
-  overflow: hidden;
-}
-.card-header {
-  background: transparent;
-  border-bottom: 1px solid #E5E7EB;
-  padding: 16px 20px;
-}
-.card-title { font-size: 1rem; font-weight: 600; color: var(--ld-text); }
-.muted-small { font-size: 0.74rem; color: var(--ld-muted); }
-
-.ld-table { font-size: 0.86rem; }
-.ld-table thead th {
-  background: #F9FAFB;
-  color: var(--ld-muted);
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 600;
-  border-bottom: 1px solid #E5E7EB;
-  padding: 12px 20px;
-}
-.ld-table tbody td {
-  padding: 13px 20px;
-  border-bottom: 1px solid #F3F4F6;
-  color: var(--ld-text);
-}
-.cell-strong { font-weight: 600; color: var(--ld-text); }
-
-.ld-table tfoot td {
-  padding: 14px 20px;
-  background: #F9FAFB;
-  font-weight: 700;
-}
-.foot-total { text-align: right; color: var(--ld-muted); }
-.foot-amount { color: var(--ld-text); }
-
-.pill {
+  font-size: 0.88rem;
+  padding: 10px 18px;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 0.74rem;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    background-color: $gold-hover;
+    color: $gold-text;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-icon {
+    font-size: 0.95rem;
+    line-height: 1;
+    font-weight: 700;
+    margin-right: 2px;
+  }
+}
+
+// --- Tarjetas KPI (4 en fila) ---
+.kpi-grid {
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  background: $card-bg;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  padding: 18px 20px;
+  height: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.kpi-label {
+  font-size: 0.72rem;
+  color: $text-muted;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.kpi-value {
+  font-size: 1.95rem;
   font-weight: 600;
-  white-space: nowrap;
-}
-.pill-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.pill-warning { background: #FBF3DC; color: #8A6100; }
-.pill-success { background: #E8F5EE; color: #1E7B4F; }
-.pill-slate { background: #EEF1F4; color: #6B7A8A; }
+  color: $text-main;
+  line-height: 1.15;
+  margin-bottom: 6px;
+  word-break: break-word;
 
-/* Tarjetas móviles */
-.comision-cards { display: flex; flex-direction: column; gap: 12px; padding: 12px; }
-.comision-card {
-  border: 1px solid #E5E7EB;
-  border-radius: 10px;
-  padding: 12px;
-  background: #FAFAFA;
+  // Valor de comisiones pendientes en color dorado/advertencia según mockup
+  &.valor-warning {
+    color: $gold-primary;
+  }
 }
-.cc-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-top: 10px;
-}
-.cc-grid .lbl {
-  display: block;
-  font-size: 0.66rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--ld-muted);
-}
-.cc-grid .val { display: block; font-size: 0.9rem; color: var(--ld-text); }
-.cc-grid .val.strong { font-weight: 700; }
 
-/* Barras horizontales */
-.hbar-row {
-  display: grid;
-  grid-template-columns: 130px 1fr auto;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
+.kpi-note {
+  font-size: 0.75rem;
+
+  &.note-muted {
+    color: #9CA3AF;
+  }
+
+  &.note-warning {
+    color: $amber-text;
+  }
 }
-.hbar-label { font-size: 0.82rem; color: var(--ld-text); }
+
+// --- Layout de 2 Columnas (75% + 25%) ---
+@media (min-width: 992px) {
+  .row.g-4 {
+    > .col-lg-8 {
+      flex: 0 0 74%;
+      max-width: 74%;
+    }
+    > .col-lg-4 {
+      flex: 0 0 26%;
+      max-width: 26%;
+    }
+  }
+}
+
+// --- Tarjetas Genéricas LD ---
+.ld-card {
+  background: $card-bg;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.card-header {
+  background: transparent;
+  border-bottom: 1px solid $border-color;
+  padding: 16px 22px;
+}
+
+.card-title {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: $text-main;
+}
+
+.muted-small {
+  font-size: 0.78rem;
+  color: #9CA3AF;
+}
+
+// --- Tabla de Cálculo de Comisiones ---
+.table-responsive {
+  border-radius: 0 0 12px 12px;
+}
+
+.ld-table {
+  width: 100%;
+  font-size: 0.86rem;
+  margin-bottom: 0;
+  border-collapse: collapse;
+
+  thead th {
+    background: #FAFAFA;
+    color: $text-muted;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border-bottom: 1px solid $border-color;
+    padding: 12px 18px;
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 13px 18px;
+    border-bottom: 1px solid #F3F4F6;
+    color: #374151;
+    vertical-align: middle;
+  }
+
+  tfoot td {
+    padding: 14px 18px;
+    background: #FAFAFA;
+    border-top: 1px solid $border-color;
+  }
+}
+
+.cell-strong {
+  font-weight: 600;
+  color: $text-main;
+}
+
+.cell-muted {
+  font-size: 0.78rem;
+  color: $text-muted;
+}
+
+.foot-total {
+  text-align: right;
+  font-weight: 600;
+  color: $text-muted;
+  font-size: 0.86rem;
+}
+
+.foot-amount {
+  font-weight: 700;
+  color: $text-main;
+  font-size: 0.95rem;
+}
+
+// --- Panel Lateral de Distribución ---
+.dist-panel {
+  .card-body {
+    padding: 20px 22px;
+  }
+}
+
+.dist-section-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: $text-muted;
+  letter-spacing: 0.02em;
+  margin-bottom: 16px;
+}
+
+.dist-divider {
+  border-top: 1px solid #F3F4F6;
+  margin: 22px 0;
+}
+
+// Barras Horizontales con relleno dorado
+.hbar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hbar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hbar-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.hbar-label {
+  font-size: 0.84rem;
+  color: $text-main;
+  font-weight: 400;
+}
+
+.hbar-value {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: $text-main;
+}
+
 .hbar-track {
   background: #F3F4F6;
   border-radius: 999px;
-  height: 22px;
+  height: 8px;
   overflow: hidden;
+  width: 100%;
 }
-.hbar-fill {
-  background: var(--ld-gold);
+
+.hbar-fill,
+.hbar-fill-alt {
+  background: $gold-primary; // Barras doradas tanto por modelo como por relleno según mockup
   height: 100%;
   border-radius: 999px;
-  transition: width 0.5s;
+  transition: width 0.5s ease;
 }
-.hbar-fill.fill-slate { background: var(--ld-slate); }
-.hbar-value { font-size: 0.82rem; font-weight: 600; color: var(--ld-text); }
 
-@media (max-width: 575.98px) {
-  .hbar-row {
-    grid-template-columns: 1fr;
-    gap: 4px;
+// --- Píldoras de Estado ---
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  white-space: nowrap;
+
+  .pill-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  // Pagado = verde
+  &.pill-success {
+    background: $success-bg;
+    color: $success-text;
+  }
+
+  // Pendiente = ámbar
+  &.pill-warning {
+    background: $amber-bg;
+    color: $amber-text;
+  }
+
+  // En revisión = slate/gris
+  &.pill-slate {
+    background: $slate-bg;
+    color: $slate-text;
+  }
+}
+
+// --- Tarjetas de Comisiones (Móvil) ---
+.comision-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+}
+
+.comision-card {
+  border: 1px solid $border-color;
+  border-radius: 10px;
+  padding: 14px;
+  background: $card-bg;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+
+  .cc-top {
+    margin-bottom: 10px;
+  }
+
+  .cc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+
+    .lbl {
+      display: block;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: $text-muted;
+      margin-bottom: 2px;
+    }
+
+    .val {
+      display: block;
+      font-size: 0.88rem;
+      color: $text-main;
+
+      &.strong {
+        font-weight: 700;
+      }
+    }
   }
 }

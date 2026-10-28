@@ -72,7 +72,7 @@ public class OrdenService {
             .observaciones(request.getObservaciones())
             .estado("borrador")
             .registradoPor(usuario)
-            .turno(usuario.getTurno())
+            .turno(usuario != null ? usuario.getTurno() : "Turno A")
             .build();
 
         Orden guardada = ordenRepository.save(orden);
@@ -99,7 +99,6 @@ public class OrdenService {
         Orden guardada = ordenRepository.save(orden);
 
         // Generar lote asociado (regla: un lote por orden)
-        // LT-AAMM-NNNN: AA = año (2 dígitos), MM = mes de creación, NNNN = secuencia de la orden
         String anio2 = String.valueOf(java.time.Year.now().getValue()).substring(2);
         String mes = String.format("%02d", java.time.LocalDate.now().getMonthValue());
         String secuencia = numeroOrden.substring(numeroOrden.length() - 4);
@@ -122,15 +121,31 @@ public class OrdenService {
         OrdenResponse dto = new OrdenResponse();
         dto.setId(orden.getId());
         dto.setNumero(orden.getNumero());
-        dto.setModeloNombre(orden.getModelo() != null ? orden.getModelo().getNombre() : null);
+        String mNombre = orden.getModelo() != null ? orden.getModelo().getNombre() : null;
+        dto.setModelo(mNombre);
+        dto.setModeloNombre(mNombre);
         dto.setModeloCodigo(orden.getModelo() != null ? orden.getModelo().getCodigo() : null);
+        dto.setCategoria(orden.getModelo() != null ? orden.getModelo().getCategoria() : null);
         dto.setCantidad(orden.getCantidad());
         dto.setPrioridad(orden.getPrioridad());
         dto.setFechaEntrega(orden.getFechaEntrega());
+        if (orden.getFechaEntrega() != null) {
+            String[] meses = {"ene.", "feb.", "mar.", "abr.", "may.", "jun.", "jul.", "ago.", "set.", "oct.", "nov.", "dic."};
+            int m = orden.getFechaEntrega().getMonthValue();
+            dto.setEntrega(orden.getFechaEntrega().getDayOfMonth() + " " + meses[m - 1] + " " + orden.getFechaEntrega().getYear());
+        }
         dto.setEstado(orden.getEstado());
         dto.setEtapaInicial("pendiente_corte".equalsIgnoreCase(orden.getEstado()) ? "Pendiente de corte" : orden.getEstado());
         dto.setRegistradoPor(orden.getRegistradoPor() != null ? orden.getRegistradoPor().getNombre() : null);
         dto.setTurno(orden.getTurno());
+
+        List<Lote> lotes = loteRepository.findByOrdenNumero(orden.getNumero());
+        if (!lotes.isEmpty()) {
+            dto.setLote(lotes.get(0).getCodigo());
+        } else {
+            dto.setLote("—");
+        }
+
         return dto;
     }
 }

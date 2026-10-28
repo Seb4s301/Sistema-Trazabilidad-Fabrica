@@ -43,10 +43,10 @@
         <label class="field-label">Modelo de colchón <span class="req">*</span></label>
         <select class="form-select" [(ngModel)]="modeloId">
           <option [ngValue]="null" disabled>Selecciona un modelo</option>
-          <option *ngFor="let m of modelos" [ngValue]="m.id">{{ m.nombre }}</option>
+          <option *ngFor="let m of modelos" [ngValue]="m.id">{{ m.nombre }} ({{ m.categoria }})</option>
         </select>
         <div class="field-help" *ngIf="modeloSeleccionado">
-          Código de producto: <strong>{{ modeloSeleccionado.codigo }}</strong>
+          Código: <strong>{{ modeloSeleccionado.codigo }}</strong> · Relleno: {{ modeloSeleccionado.relleno }}
         </div>
       </div>
 
@@ -57,7 +57,7 @@
           <button type="button" class="chip" *ngFor="let d of dimensiones"
                   [class.selected]="dimensionId === d.id"
                   (click)="dimensionId = d.id">
-            {{ d.label }}
+            {{ d.nombre }}
           </button>
         </div>
         <div class="field-help" *ngIf="dimensionSeleccionada">{{ dimensionSeleccionada.medidas }}</div>
@@ -70,7 +70,7 @@
           <label class="radio-card" *ngFor="let r of rellenos"
                  [class.selected]="rellenoId === r.id">
             <input type="radio" name="relleno" [value]="r.id" [(ngModel)]="rellenoId" hidden>
-            <span class="radio-title">{{ r.titulo }}</span>
+            <span class="radio-title">{{ r.nombre }}</span>
             <span class="radio-desc">{{ r.descripcion }}</span>
           </label>
         </div>
@@ -145,11 +145,11 @@
         </div>
         <div class="confirm-item">
           <span class="lbl">Dimensión</span>
-          <span class="val">{{ dimensionSeleccionada?.label || '—' }}</span>
+          <span class="val">{{ dimensionSeleccionada?.nombre || '—' }}</span>
         </div>
         <div class="confirm-item">
           <span class="lbl">Relleno</span>
-          <span class="val">{{ rellenoSeleccionado?.titulo || '—' }}</span>
+          <span class="val">{{ rellenoSeleccionado?.nombre || '—' }}</span>
         </div>
         <div class="confirm-item">
           <span class="lbl">Cantidad</span>
@@ -211,7 +211,7 @@
       </div>
       <div class="summary-row">
         <span class="lbl">Dimensión</span>
-        <span class="val">{{ dimensionSeleccionada?.label || '—' }}</span>
+        <span class="val">{{ dimensionSeleccionada?.nombre || '—' }}</span>
       </div>
       <div class="summary-row" *ngIf="dimensionSeleccionada">
         <span class="lbl">Medidas</span>
@@ -219,7 +219,7 @@
       </div>
       <div class="summary-row">
         <span class="lbl">Relleno</span>
-        <span class="val">{{ rellenoSeleccionado?.titulo || '—' }}</span>
+        <span class="val">{{ rellenoSeleccionado?.nombre || '—' }}</span>
       </div>
       <div class="summary-row">
         <span class="lbl">Cantidad</span>
