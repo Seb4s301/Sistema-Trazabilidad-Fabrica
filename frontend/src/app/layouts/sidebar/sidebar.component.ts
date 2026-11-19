@@ -8,7 +8,6 @@ import { AuthService } from '../../core/auth.service';
 })
 export class SidebarComponent {
 
-  lotesEnPlanta = 8; // badge de lotes en planta
 
   constructor(public authService: AuthService) {}
 

@@ -23,6 +23,8 @@ public class OrdenController {
     @Autowired
     private OrdenService ordenService;
 
+    @Autowired private com.latin.dream.erp.application.service.HistorialService historial;
+
     @GetMapping
     public ResponseEntity<List<OrdenResponse>> listar(
             @RequestParam(required = false) String estado,
@@ -46,4 +48,16 @@ public class OrdenController {
                                                @UsuarioActual Usuario usuario) {
         return ResponseEntity.ok(ordenService.crearOrden(id, usuario));
     }
+    @PostMapping
+    public ResponseEntity<OrdenResponse> crearDirecta(@Valid @RequestBody OrdenRequest request, @UsuarioActual Usuario usuario) {
+        return ResponseEntity.ok(ordenService.crear(request,usuario));
+    }
+    @PutMapping("/{id}/borrador")
+    public ResponseEntity<OrdenResponse> editar(@PathVariable String id,@Valid @RequestBody OrdenRequest request,@UsuarioActual Usuario usuario) {
+        return ResponseEntity.ok(ordenService.editarBorrador(id,request,usuario));
+    }
+    @DeleteMapping("/{id}/borrador")
+    public ResponseEntity<Void> eliminar(@PathVariable String id) { ordenService.eliminarBorrador(id); return ResponseEntity.noContent().build(); }
+    @GetMapping("/{numero}/historial")
+    public ResponseEntity<?> historial(@PathVariable String numero) { return ResponseEntity.ok(historial.consultar(ordenService.buscarPorNumero(numero).getId())); }
 }

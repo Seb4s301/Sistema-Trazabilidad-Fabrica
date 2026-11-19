@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 
 export interface Usuario {
-  id?: number;
+  id?: string;
   nombre: string;
   correo: string;
   rol: string;
@@ -30,7 +30,7 @@ export interface AuthRequest {
 export class AuthService {
 
   private apiUrl = `${environment.apiBaseUrl}/auth`;
-  private currentUserSubject = new BehaviorSubject<Usuario | null>(null);
+  private currentUserSubject = new BehaviorSubject<Usuario | null>(this.getUsuario());
   public currentUser$ = this.currentUserSubject.asObservable();
 
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.tieneToken());
@@ -38,19 +38,23 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  login(request: AuthRequest): Observable<AuthResponse> {
+  login(request: AuthRequest, recordar = false): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, request).pipe(
       tap(response => {
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('usuario', JSON.stringify({
+        for (const storage of [localStorage, sessionStorage]) { storage.removeItem('token'); storage.removeItem('usuario'); }
+        const storage = recordar ? localStorage : sessionStorage;
+        storage.setItem('token', response.token);
+        storage.setItem('usuario', JSON.stringify({
           nombre: response.nombre,
           correo: response.correo,
-          rol: response.rol
+          rol: response.rol,
+          turno: this.turnoDelToken(response.token)
         }));
         this.currentUserSubject.next({
           nombre: response.nombre,
           correo: response.correo,
-          rol: response.rol
+          rol: response.rol,
+          turno: this.turnoDelToken(response.token)
         });
         this.isAuthenticatedSubject.next(true);
       })
@@ -58,30 +62,43 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('usuario');
+    for (const storage of [localStorage, sessionStorage]) { storage.removeItem('token'); storage.removeItem('usuario'); }
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
     this.router.navigate(['/login']);
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return sessionStorage.getItem('token') || localStorage.getItem('token');
   }
 
   getUsuario(): Usuario | null {
-    const u = localStorage.getItem('usuario');
-    return u ? JSON.parse(u) : null;
+    const u = sessionStorage.getItem('usuario') || localStorage.getItem('usuario');
+    try { return u ? JSON.parse(u) : null; } catch { return null; }
   }
 
   tieneToken(): boolean {
-    return !!localStorage.getItem('token');
+    const token = this.getToken();
+    if (!token) return false;
+    try {
+      return JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).exp * 1000 > Date.now();
+    } catch { return false; }
   }
 
-  esRol(rol: string): boolean {
-    const usuario = this.getUsuario();
-    return usuario?.rol === rol;
+  private turnoDelToken(token: string): string | undefined {
+    try { return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0)))).turno; }
+    catch { return undefined; }
   }
+
+  puedeCrearOrden(): boolean {
+    return ['gerente', 'supervisora', 'vendedora'].includes(this.getUsuario()?.rol ?? '');
+  }
+
+  puedeRegistrarAvance(): boolean {
+    return ['gerente', 'supervisora', 'encargado_area'].includes(this.getUsuario()?.rol ?? '');
+  }
+
+  puedeAdministrar(): boolean { return ['gerente', 'supervisora'].includes(this.getUsuario()?.rol ?? ''); }
 
   puedeVerComisiones(): boolean {
     const usuario = this.getUsuario();

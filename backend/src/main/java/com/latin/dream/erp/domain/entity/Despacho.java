@@ -26,6 +26,12 @@ public class Despacho {
     @Column(nullable = false, length = 20, unique = true)
     private String codigo; // DS-XXXX
 
+    @Column(name="solicitud_id",unique=true,length=36)
+    private String solicitudId;
+
+    @Column(name="entregado_en")
+    private LocalDateTime entregadoEn;
+
     @Column(nullable = false, length = 150)
     private String cliente;
 

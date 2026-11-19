@@ -1,4 +1,4 @@
-import { Component, inject, Output, EventEmitter, Input } from '@angular/core';
+import { Component, OnChanges, inject, Output, EventEmitter, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProduccionService, Lote, AvanceLote } from '../../core/services/produccion.service';
@@ -30,15 +30,12 @@ import { ProduccionService, Lote, AvanceLote } from '../../core/services/producc
         <div class="form-group">
           <label class="form-label">Área destino <span class="req">*</span></label>
           <select class="form-select" [(ngModel)]="avance.area_destino">
-            <option value="Corte">Corte</option>
-            <option value="Ensamblaje">Ensamblaje</option>
-            <option value="Tapizado">Tapizado</option>
-            <option value="Calidad">Calidad</option>
-            <option value="Listo">Listo para despacho</option>
+            <option value="">Selecciona la siguiente etapa</option>
+            <option *ngFor="let area of destinos" [value]="area">{{ area }}</option>
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label">Resultado (solo Calidad)</label>
+        <div class="form-group" *ngIf="lote?.area_actual === 'Calidad'">
+          <label class="form-label">Resultado de Calidad</label>
           <select class="form-select" [(ngModel)]="avance.resultado">
             <option value="">--</option>
             <option value="aprobado">Aprobado</option>
@@ -60,61 +57,9 @@ import { ProduccionService, Lote, AvanceLote } from '../../core/services/producc
       </div>
     </div>
   `,
-  styles: [`
-    .modal-backdrop {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-      display: flex; align-items: center; justify-content: center;
-      padding: 1rem; overflow-y: auto;
-      z-index: 1050; backdrop-filter: blur(2px);
-    }
-    .modal-panel {
-      background: #fff; border-radius: 12px; width: 100%; max-width: 480px;
-      max-height: 90vh; overflow: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      animation: modalIn 0.25s ease-out; position: relative; z-index: 1051;
-    }
-    @keyframes modalIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .modal-header {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 1.5rem 1.5rem 1rem; border-bottom: 1px solid #e8e8e8;
-    }
-    .modal-title { margin: 0; font-size: 1.125rem; font-weight: 700; color: #1a1a1a; }
-    .modal-close {
-      background: none; border: none; font-size: 1.5rem; cursor: pointer;
-      color: #888; line-height: 1;
-    }
-    .modal-body { padding: 1.5rem; }
-    .form-group { margin-bottom: 1rem; }
-    .form-label { display: block; font-size: 0.875rem; font-weight: 600;
-      color: #666; margin-bottom: 0.4rem; }
-    .req { color: #d32f2f; }
-    .form-value { display: block; font-size: 1rem; color: #333;
-      padding: 0.5rem 0.75rem; background: #f8f9fa; border: 1px solid #e8e8e8;
-      border-radius: 6px; }
-    .form-select, .form-control {
-      width: 100%; padding: 0.6rem 0.75rem; border: 1px solid #ccc;
-      border-radius: 6px; font-size: 1rem; background: #fff;
-    }
-    .modal-footer {
-      display: flex; justify-content: flex-end; gap: 0.75rem;
-      padding: 1rem 1.5rem; border-top: 1px solid #e8e8e8;
-    }
-    .btn {
-      padding: 0.6rem 1.25rem; border-radius: 6px; font-weight: 600;
-      font-size: 0.95rem; cursor: pointer; border: 1px solid transparent;
-    }
-    .btn-outline-secondary {
-      background: transparent; border-color: #ccc; color: #555;
-    }
-    .btn-ld-gold {
-      background: #D4A935; color: #fff; border: none;
-    }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-  `]
+  styleUrls: ['../../shared/modal.scss']
 })
-export class AvanceLoteModalComponent {
+export class AvanceLoteModalComponent implements OnChanges {
 
   private produccionService = inject(ProduccionService);
 
@@ -131,6 +76,20 @@ export class AvanceLoteModalComponent {
   };
   guardando = false;
 
+  get destinos(): string[] {
+    switch (this.lote?.area_actual) {
+      case 'Corte': return ['Ensamblaje'];
+      case 'Ensamblaje': return ['Tapizado'];
+      case 'Tapizado': return ['Calidad'];
+      case 'Calidad': return ['Listo', 'Tapizado'];
+      default: return [];
+    }
+  }
+
+  ngOnChanges(): void {
+    if (this.visible) this.avance = { lote_id: this.lote?.id || '', area_destino: '', resultado: '', notas: '' };
+  }
+
   cerrar(): void {
     this.visible = false;
     this.cerrado.emit();
@@ -140,7 +99,7 @@ export class AvanceLoteModalComponent {
     if (!this.lote || this.guardando || !this.avance.area_destino) return;
 
     this.guardando = true;
-    this.avance.lote_id = this.lote.id || '';
+    this.avance.lote_id = this.lote.id || this.lote.codigo;
     this.avance.area_origen = this.lote.area_actual;
 
     this.produccionService.registrarAvance(this.avance).subscribe({
@@ -151,7 +110,7 @@ export class AvanceLoteModalComponent {
       },
       error: () => {
         this.guardando = false;
-        alert('No se pudo registrar el avance. Intenta de nuevo.');
+        alert('No se pudo registrar el avance. Verifica la siguiente etapa y el resultado de Calidad.');
       }
     });
   }

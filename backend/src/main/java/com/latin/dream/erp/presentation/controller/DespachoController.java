@@ -23,8 +23,21 @@ public class DespachoController {
 
     @PatchMapping("/{codigo}/estado")
     public ResponseEntity<Map<String, Object>> actualizarEstado(@PathVariable String codigo,
-                                                                @RequestBody Map<String, String> payload) {
+                                                                @RequestBody Map<String, String> payload,
+            @com.latin.dream.erp.crosscutting.annotation.UsuarioActual com.latin.dream.erp.domain.entity.Usuario usuario) {
         String estado = payload.get("estado");
-        return ResponseEntity.ok(despachoService.actualizarEstado(codigo, estado));
+        return ResponseEntity.ok(despachoService.actualizarEstado(codigo, estado, usuario));
+    }
+    @GetMapping("/lotes-disponibles")
+    public ResponseEntity<?> disponibles() { return ResponseEntity.ok(despachoService.disponibles()); }
+    @PostMapping
+    public ResponseEntity<?> crear(@jakarta.validation.Valid @RequestBody com.latin.dream.erp.application.dto.DespachoRequest request,
+            @com.latin.dream.erp.crosscutting.annotation.UsuarioActual com.latin.dream.erp.domain.entity.Usuario usuario) {
+        return ResponseEntity.ok(despachoService.crear(request,usuario));
+    }
+    @PutMapping("/{codigo}")
+    public ResponseEntity<?> editar(@PathVariable String codigo,@jakarta.validation.Valid @RequestBody com.latin.dream.erp.application.dto.DespachoRequest request,
+            @com.latin.dream.erp.crosscutting.annotation.UsuarioActual com.latin.dream.erp.domain.entity.Usuario usuario) {
+        return ResponseEntity.ok(despachoService.editar(codigo,request,usuario));
     }
 }

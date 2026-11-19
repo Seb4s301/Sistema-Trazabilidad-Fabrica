@@ -8,7 +8,8 @@ import java.util.Optional;
 
 @Repository
 public interface DespachoRepository extends JpaRepository<Despacho, String> {
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
     Optional<Despacho> findByCodigo(String codigo);
-    List<Despacho> findByEstado(String estado);
     List<Despacho> findAllByOrderByCreadoEnDesc();
+    Optional<Despacho> findBySolicitudId(String solicitudId);
 }

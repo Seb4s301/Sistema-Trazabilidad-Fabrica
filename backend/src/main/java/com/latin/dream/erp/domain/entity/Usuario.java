@@ -39,6 +39,7 @@ public class Usuario {
     private String turno;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean activo = true;
 
     @Column(name = "creado_en", nullable = false)
@@ -46,23 +47,6 @@ public class Usuario {
 
     @Column(name = "actualizado_en")
     private LocalDateTime actualizadoEn;
-
-    public boolean esGerente() {
-        return "gerente".equalsIgnoreCase(rol);
-    }
-
-    public boolean puedeVerComisiones() {
-        return rol.equalsIgnoreCase("gerente")
-            || rol.equalsIgnoreCase("supervisora")
-            || rol.equalsIgnoreCase("contabilidad")
-            || rol.equalsIgnoreCase("caja_chica");
-    }
-
-    public boolean puedeGestionarDespacho() {
-        return rol.equalsIgnoreCase("gerente")
-            || rol.equalsIgnoreCase("supervisora")
-            || rol.equalsIgnoreCase("conductor");
-    }
 
     @PrePersist
     void onCreate() {

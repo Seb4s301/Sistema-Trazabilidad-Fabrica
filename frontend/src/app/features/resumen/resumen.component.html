@@ -1,3 +1,4 @@
+<div *ngIf="errorCarga" class="alert alert-danger" role="alert">{{ errorCarga }}</div>
 <div class="page-header d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
   <div>
     <div class="eyebrow mb-1">VISIÓN GENERAL / SEMANA {{ semana }}</div>
@@ -6,17 +7,8 @@
   </div>
 
   <div class="header-controls d-flex flex-wrap align-items-center gap-2">
-    <div class="range-selector d-flex align-items-center gap-1">
-      <span class="range-icon">📅</span>
-      <select class="form-select range-select" [(ngModel)]="periodoSeleccionado" (change)="onPeriodoCambio()">
-        <option value="semana42">12–18 oct. 2026</option>
-        <option value="semana41">5–11 oct. 2026</option>
-      </select>
-    </div>
-    <span class="updated-note d-none d-lg-inline">Datos actualizados a las 10:42</span>
-    <button type="button" class="btn btn-outline-dark btn-sm">
-      <span>↓</span> Exportar informe
-    </button>
+    <span class="updated-note" *ngIf="actualizado">Datos actualizados a las {{ actualizado }}</span>
+    <button type="button" class="btn btn-outline-dark btn-sm" (click)="cargarDatos()">Actualizar</button>
   </div>
 </div>
 
@@ -41,16 +33,13 @@
       <div class="card-header d-flex justify-content-between align-items-center">
         <div>
           <h5 class="card-title mb-0">Ritmo de producción</h5>
-          <div class="chart-period">12–18 de octubre</div>
+          <div class="chart-period">Semana actual · unidades que finalizaron Calidad</div>
         </div>
-        <div class="btn-group btn-group-sm">
-          <button type="button" class="btn" [class.active]="vistaGrafico==='dia'" (click)="cambiarVista('dia')">Día</button>
-          <button type="button" class="btn" [class.active]="vistaGrafico==='semana'" (click)="cambiarVista('semana')">Semana</button>
-        </div>
+
       </div>
       <div class="card-body">
         <div class="chart-units-label">
-          <span class="chart-units-value">{{ kpis[0]?.valor }}</span>
+          <span class="chart-units-value">{{ unidadesSemana }}</span>
           <span class="chart-units-text">Unidades esta semana</span>
         </div>
         <div class="chart-wrapper" style="height: 260px;">
@@ -141,7 +130,7 @@
 </div>
 
 <!-- Banner de alerta -->
-<div class="alert-banner d-flex flex-wrap justify-content-between align-items-center gap-2">
-  <span>⚠️ 2 lotes superaron su fecha de entrega. Revisa OP-2026-0418 y OP-2026-0420 con los responsables de línea.</span>
+<div *ngIf="kpis.length > 2 && kpis[2].valor !== '0'" class="alert-banner d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <span>⚠️ {{ kpis[2].valor }} lotes superaron su fecha de entrega. Revisa el tablero de producción.</span>
   <a routerLink="/produccion" class="link-warning">Ir a producción →</a>
 </div>

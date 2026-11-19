@@ -1,3 +1,4 @@
+import { AuthService } from '../core/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -14,7 +15,7 @@ export class LayoutComponent implements OnInit {
   today = '';
   ultimaSincronizacion = '';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, public authService: AuthService) {}
 
   ngOnInit(): void {
     this.updateFecha();
@@ -34,6 +35,7 @@ export class LayoutComponent implements OnInit {
   }
 
   private tituloDesdeRuta(url: string): string {
+    if (url.startsWith('/administracion')) return 'Modelos y tarifas';
     if (url.startsWith('/resumen')) return 'Resumen';
     if (url.startsWith('/ordenes/nueva')) return 'Nueva orden';
     if (url.startsWith('/ordenes')) return 'Órdenes';

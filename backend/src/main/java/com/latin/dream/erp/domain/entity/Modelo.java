@@ -37,5 +37,6 @@ public class Modelo {
     private String relleno; // Resortes Ensacados, Memory Foam, etc.
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean activo = true;
 }

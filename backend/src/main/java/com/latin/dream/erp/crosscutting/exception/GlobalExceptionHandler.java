@@ -1,16 +1,12 @@
 package com.latin.dream.erp.crosscutting.exception;
 
-import com.latin.dream.erp.domain.entity.Usuario;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Controlador de cross-cutting: manejo global de errores.
@@ -23,7 +19,10 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorRespuesta> manejarBusinessException(BusinessException ex) {
         ErrorRespuesta error = new ErrorRespuesta(ex.getCodigo(), ex.getMessage());
-        return ResponseEntity.badRequest().body(error);
+        HttpStatus estado = ex.getCodigo().equals("CREDENCIALES_INVALIDAS") || ex.getCodigo().equals("USUARIO_INACTIVO")
+            ? HttpStatus.UNAUTHORIZED : ex.getCodigo().endsWith("NO_ENCONTRADA") || ex.getCodigo().endsWith("NO_ENCONTRADO")
+            ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST;
+        return ResponseEntity.status(estado).body(error);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -37,6 +36,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorRespuesta> manejarConflicto(Exception ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorRespuesta("CONFLICTO_DATOS", "La operación entra en conflicto con un registro existente. Actualiza los datos e inténtalo de nuevo"));
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorRespuesta> manejarErrorGeneral(Exception ex) {
@@ -44,15 +48,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
-    /**
-     * Resuelve el usuario autenticado del contexto de seguridad (para auditar).
-     */
-    protected Usuario usuarioAutenticado() {
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getPrincipal() instanceof Usuario) {
-            return (Usuario) auth.getPrincipal();
-        }
-        return null;
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorRespuesta> manejarJsonInvalido(Exception ex) {
+        return ResponseEntity.badRequest().body(new ErrorRespuesta("JSON_INVALIDO", "El contenido de la petición no es válido"));
     }
 
     public static record ErrorRespuesta(String codigo, String mensaje) {}

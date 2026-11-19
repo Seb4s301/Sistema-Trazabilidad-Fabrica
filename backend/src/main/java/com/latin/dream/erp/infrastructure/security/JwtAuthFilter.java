@@ -13,7 +13,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 /**
  * Filtro de infraestructura: valida el JWT en cada petición protegida.
@@ -51,9 +52,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             Usuario usuario = usuarioRepository.findByCorreo(correoUsuario).orElse(null);
-            if (usuario != null && jwtService.esValido(jwt, usuario)) {
+            if (usuario != null && Boolean.TRUE.equals(usuario.getActivo()) && jwtService.esValido(jwt, usuario)) {
                 UsernamePasswordAuthenticationToken authToken =
-                    new UsernamePasswordAuthenticationToken(usuario, null, Collections.emptyList());
+                    new UsernamePasswordAuthenticationToken(usuario, null, List.of(new SimpleGrantedAuthority(usuario.getRol())));
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }

@@ -1,3 +1,4 @@
+import { ProgramarDespachoComponent } from './programar-despacho.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,6 +12,6 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [DespachoComponent],
-  imports: [CommonModule, FormsModule, RouterModule.forChild(routes), EstadoDespachoModalComponent]
+  imports: [ProgramarDespachoComponent,CommonModule, FormsModule, RouterModule.forChild(routes), EstadoDespachoModalComponent]
 })
 export class DespachoModule {}

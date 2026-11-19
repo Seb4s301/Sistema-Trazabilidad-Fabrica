@@ -1,5 +1,7 @@
+import { RegistroHistorial } from '../../shared/historial.component';
+import { AuthService } from '../../core/auth.service';
 import { Component, OnInit, inject } from '@angular/core';
-import { ProduccionService, ProduccionData, Lote, Metrica, AreaProduccion } from '../../core/services/produccion.service';
+import { ProduccionService, Lote, Metrica, AreaProduccion } from '../../core/services/produccion.service';
 
 @Component({
   selector: 'app-produccion',
@@ -8,7 +10,12 @@ import { ProduccionService, ProduccionData, Lote, Metrica, AreaProduccion } from
 })
 export class ProduccionComponent implements OnInit {
 
+  public authService = inject(AuthService);
+
   private produccionService = inject(ProduccionService);
+
+  historialLote: Lote | null = null;
+  movimientos: RegistroHistorial[] = []; historialCargando = false; historialError = '';
 
   vista: 'tablero' | 'lista' = 'tablero';
 
@@ -23,13 +30,14 @@ export class ProduccionComponent implements OnInit {
   metricas: Metrica[] = [];
   areas: AreaProduccion[] = [];
   cargando = false;
+  errorCarga = '';
 
   get totalLotes(): number {
     return this.areas.reduce((acc, a) => acc + a.lotes.length, 0);
   }
 
   get totalUnidades(): number {
-    return this.areas.reduce((acc, a) => acc + a.lotes.reduce((s, l) => s + l.unidades, 0), 0);
+    return this.areas.reduce((acc, a) => acc + a.lotes.reduce((s, l) => s + (l.pendientes ?? l.unidades), 0), 0);
   }
 
   ngOnInit(): void {
@@ -37,6 +45,7 @@ export class ProduccionComponent implements OnInit {
   }
 
   cargarProduccion(): void {
+    this.errorCarga = '';
     this.cargando = true;
     this.produccionService.getProduccion().subscribe({
       next: (data) => {
@@ -45,9 +54,8 @@ export class ProduccionComponent implements OnInit {
         this.cargando = false;
       },
       error: () => {
-        const demo = this.produccionService.getDemoData();
-        this.metricas = demo.metricas;
-        this.areas = demo.areas;
+        this.errorCarga = 'No se pudieron cargar los datos. Comprueba la conexión y tus permisos.';
+        this.metricas = []; this.areas = [];
         this.cargando = false;
       }
     });
@@ -58,8 +66,20 @@ export class ProduccionComponent implements OnInit {
     return area.lotes.filter(l =>
       (!b || l.orden.toLowerCase().includes(b) || l.codigo.toLowerCase().includes(b) || l.modelo.toLowerCase().includes(b)) &&
       (!this.filtroPrioridad || l.prioridad === this.filtroPrioridad) &&
-      (!this.filtroResponsable || l.responsable === this.filtroResponsable)
+      (!this.filtroResponsable || l.responsable === this.filtroResponsable) &&
+      (!this.filtroEntrega || (this.filtroEntrega === 'retrasados' ? !!l.retrasado : this.entregaEstaSemana(l.fecha_entrega)))
     );
+  }
+
+  private entregaEstaSemana(fecha?: string): boolean {
+    if (!fecha) return false;
+    const lunes = new Date();
+    lunes.setHours(0, 0, 0, 0);
+    lunes.setDate(lunes.getDate() - (lunes.getDay() + 6) % 7);
+    const fin = new Date(lunes);
+    fin.setDate(fin.getDate() + 7);
+    const entrega = new Date(fecha + 'T00:00:00');
+    return entrega >= lunes && entrega < fin;
   }
 
   get responsables(): string[] {
@@ -74,6 +94,11 @@ export class ProduccionComponent implements OnInit {
     return 'pill-slate';
   }
 
+  verHistorial(lote: Lote): void {
+    this.historialLote = lote; this.movimientos = []; this.historialError = ''; this.historialCargando = true;
+    this.produccionService.historial(lote.id!).subscribe({ next: datos => { this.movimientos = datos; this.historialCargando = false; },
+      error: () => { this.historialError = 'No se pudo consultar el historial.'; this.historialCargando = false; } });
+  }
   abrirModalAvance(lote: Lote): void {
     this.loteSeleccionado = lote;
     this.modalAvanceVisible = true;
@@ -89,7 +114,4 @@ export class ProduccionComponent implements OnInit {
     this.cargarProduccion(); // Recargar datos
   }
 
-  onFiltroCambio(): void {
-    // Los filtros son reactivos con [(ngModel)]
-  }
 }

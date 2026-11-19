@@ -8,7 +8,6 @@ import com.latin.dream.erp.domain.entity.Usuario;
 import com.latin.dream.erp.domain.entity.Lote;
 import com.latin.dream.erp.domain.repository.OrdenRepository;
 import com.latin.dream.erp.domain.repository.ModeloRepository;
-import com.latin.dream.erp.domain.repository.UsuarioRepository;
 import com.latin.dream.erp.domain.repository.LoteRepository;
 import com.latin.dream.erp.crosscutting.exception.BusinessException;
 import org.springframework.stereotype.Service;
@@ -27,28 +26,29 @@ public class OrdenService {
 
     private final OrdenRepository ordenRepository;
     private final ModeloRepository modeloRepository;
-    private final UsuarioRepository usuarioRepository;
     private final LoteRepository loteRepository;
     private final NumeroOrdenService numeroOrdenService;
+    private final HistorialService historial;
 
     public OrdenService(OrdenRepository ordenRepository,
                         ModeloRepository modeloRepository,
-                        UsuarioRepository usuarioRepository,
                         LoteRepository loteRepository,
-                        NumeroOrdenService numeroOrdenService) {
+                        NumeroOrdenService numeroOrdenService, HistorialService historial) {
         this.ordenRepository = ordenRepository;
         this.modeloRepository = modeloRepository;
-        this.usuarioRepository = usuarioRepository;
         this.loteRepository = loteRepository;
         this.numeroOrdenService = numeroOrdenService;
+        this.historial = historial;
     }
 
     @Transactional(readOnly = true)
     public List<OrdenResponse> listar(String estado, String prioridad) {
+        java.util.Map<String, Lote> codigos = loteRepository.findAll().stream()
+            .collect(Collectors.toMap(l -> l.getOrden().getId(), l -> l, (a, b) -> a));
         return ordenRepository.findAll().stream()
             .filter(o -> estado == null || estado.isBlank() || o.getEstado().equalsIgnoreCase(estado))
-            .filter(o -> prioridad == null || prioridad.isBlank() || o.getPrioridad().equalsIgnoreCase(prioridad))
-            .map(this::toResponse)
+            .filter(o -> prioridad == null || prioridad.isBlank() || prioridad.equalsIgnoreCase(o.getPrioridad()))
+            .map(o -> toResponse(o, codigos.get(o.getId())))
             .collect(Collectors.toList());
     }
 
@@ -60,12 +60,10 @@ public class OrdenService {
     }
 
     public OrdenResponse guardarBorrador(OrdenRequest request, Usuario usuario) {
-        Modelo modelo = modeloRepository.findById(request.getModeloId())
-            .orElseThrow(() -> new BusinessException("MODELO_NO_ENCONTRADO", "El modelo seleccionado no existe"));
-
+        Modelo modelo = obtenerModelo(request.getModeloId());
         Orden orden = Orden.builder()
-            // La columna numero es VARCHAR(20): "BORR-" + timestamp = 18 caracteres.
-            .numero("BORR-" + System.currentTimeMillis())
+            // Identificador temporal de 20 caracteres.
+            .numero("BORR-" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 15))
             .modelo(modelo)
             .cantidad(request.getCantidad())
             .prioridad(request.getPrioridad())
@@ -77,17 +75,20 @@ public class OrdenService {
             .build();
 
         Orden guardada = ordenRepository.save(orden);
+        historial.registrar(guardada, null, usuario, "Borrador guardado");
         return toResponse(guardada);
     }
 
     public OrdenResponse crearOrden(String id, Usuario usuario) {
-        Orden orden = ordenRepository.findById(id)
+        numeroOrdenService.bloquearNumeracion();
+        Orden orden = ordenRepository.bloquearPorId(id)
             .orElseThrow(() -> new BusinessException("ORDEN_NO_ENCONTRADA", "La orden no existe"));
 
         if (!"borrador".equalsIgnoreCase(orden.getEstado())) {
             throw new BusinessException("ORDEN_NO_ES_BORRADOR", "Solo se pueden crear órdenes desde estado borrador");
         }
 
+        validarCompleta(orden);
         if (orden.getFechaEntrega().isBefore(LocalDate.now())) {
             throw new BusinessException("FECHA_ENTREGA_PASADA", "La fecha de entrega no puede ser anterior a hoy");
         }
@@ -95,14 +96,13 @@ public class OrdenService {
         String numeroOrden = numeroOrdenService.generarSiguiente();
         orden.setNumero(numeroOrden);
         orden.setEstado("pendiente_corte");
-        orden.setRegistradoPor(usuario);
 
         Orden guardada = ordenRepository.save(orden);
 
         // Generar lote asociado (regla: un lote por orden)
         String anio2 = String.valueOf(java.time.Year.now().getValue()).substring(2);
         String mes = String.format("%02d", java.time.LocalDate.now().getMonthValue());
-        String secuencia = numeroOrden.substring(numeroOrden.length() - 4);
+        String secuencia = numeroOrden.substring(8);
         String codigoLote = "LT-" + anio2 + mes + "-" + secuencia;
 
         Lote lote = Lote.builder()
@@ -114,13 +114,69 @@ public class OrdenService {
             .retrasado(false)
             .build();
         loteRepository.save(lote);
+        historial.registrar(guardada, "borrador", usuario, "Orden confirmada e ingresada a Corte");
 
         return toResponse(guardada);
     }
 
+    public OrdenResponse crear(OrdenRequest request, Usuario usuario) {
+        numeroOrdenService.bloquearNumeracion();
+        if (request.getSolicitudId() == null) throw new BusinessException("SOLICITUD_REQUERIDA", "Falta el identificador de solicitud");
+        var previa = ordenRepository.findBySolicitudId(request.getSolicitudId());
+        if (previa.isPresent()) {
+            Orden o=previa.get();
+            if (o.getRegistradoPor()==null || usuario==null || !o.getRegistradoPor().getId().equals(usuario.getId()))
+                throw new BusinessException("SOLICITUD_INVALIDA", "La solicitud pertenece a otro usuario");
+            if (!java.util.Objects.equals(o.getCantidad(),request.getCantidad()) || o.getModelo()==null
+                    || !o.getModelo().getId().equals(request.getModeloId()) || !java.util.Objects.equals(o.getFechaEntrega(),request.getFechaEntrega())
+                    || !java.util.Objects.equals(o.getPrioridad(),request.getPrioridad()) || !java.util.Objects.equals(o.getObservaciones(),request.getObservaciones()))
+                throw new BusinessException("SOLICITUD_CAMBIADA", "La solicitud ya fue procesada con otros datos");
+            return toResponse(o);
+        }
+        OrdenResponse borrador=guardarBorrador(request,usuario);
+        Orden o=ordenRepository.bloquearPorId(borrador.getId()).orElseThrow();
+        o.setSolicitudId(request.getSolicitudId());
+        return crearOrden(o.getId(),usuario);
+    }
+
+    public OrdenResponse editarBorrador(String id, OrdenRequest request, Usuario usuario) {
+        Orden o=ordenRepository.bloquearPorId(id).orElseThrow(() -> new BusinessException("ORDEN_NO_ENCONTRADA","La orden no existe"));
+        exigirBorrador(o);
+        o.setModelo(obtenerModelo(request.getModeloId())); o.setCantidad(request.getCantidad()); o.setPrioridad(request.getPrioridad());
+        o.setFechaEntrega(request.getFechaEntrega()); o.setObservaciones(request.getObservaciones());
+        ordenRepository.save(o); historial.registrar(o,"borrador",usuario,"Borrador actualizado"); return toResponse(o);
+    }
+
+    public void eliminarBorrador(String id) {
+        Orden o=ordenRepository.bloquearPorId(id).orElseThrow(() -> new BusinessException("ORDEN_NO_ENCONTRADA","La orden no existe"));
+        exigirBorrador(o); historial.borrarBorrador(id); ordenRepository.delete(o);
+    }
+
+    private void exigirBorrador(Orden o) {
+        if (!"borrador".equals(o.getEstado())) throw new BusinessException("ORDEN_NO_ES_BORRADOR","Solo se pueden editar o eliminar borradores");
+    }
+    private Modelo obtenerModelo(String id) {
+        if (id==null || id.isBlank()) return null;
+        Modelo m=modeloRepository.findById(id).orElseThrow(() -> new BusinessException("MODELO_NO_ENCONTRADO","El modelo no existe"));
+        if (!Boolean.TRUE.equals(m.getActivo())) throw new BusinessException("MODELO_INACTIVO","El modelo está inactivo");
+        return m;
+    }
+    private void validarCompleta(Orden o) {
+        if (o.getModelo()==null || !Boolean.TRUE.equals(o.getModelo().getActivo()) || o.getCantidad()==null || o.getCantidad()<1
+            || o.getFechaEntrega()==null || o.getPrioridad()==null || !java.util.Set.of("Alta","Normal","Baja").contains(o.getPrioridad()))
+            throw new BusinessException("ORDEN_INCOMPLETA","Completa modelo activo, cantidad, prioridad y fecha antes de confirmar");
+    }
+
     private OrdenResponse toResponse(Orden orden) {
+        Lote lote = loteRepository.findByOrdenNumero(orden.getNumero()).stream().findFirst().orElse(null);
+        return toResponse(orden, lote);
+    }
+
+    private OrdenResponse toResponse(Orden orden, Lote lote) {
         OrdenResponse dto = new OrdenResponse();
         dto.setId(orden.getId());
+        dto.setModeloId(orden.getModelo()==null?null:orden.getModelo().getId());
+        dto.setObservaciones(orden.getObservaciones());
         dto.setNumero(orden.getNumero());
         String mNombre = orden.getModelo() != null ? orden.getModelo().getNombre() : null;
         dto.setModelo(mNombre);
@@ -130,22 +186,14 @@ public class OrdenService {
         dto.setCantidad(orden.getCantidad());
         dto.setPrioridad(orden.getPrioridad());
         dto.setFechaEntrega(orden.getFechaEntrega());
-        if (orden.getFechaEntrega() != null) {
-            String[] meses = {"ene.", "feb.", "mar.", "abr.", "may.", "jun.", "jul.", "ago.", "set.", "oct.", "nov.", "dic."};
-            int m = orden.getFechaEntrega().getMonthValue();
-            dto.setEntrega(orden.getFechaEntrega().getDayOfMonth() + " " + meses[m - 1] + " " + orden.getFechaEntrega().getYear());
-        }
+        dto.setEntrega(Fechas.corta(orden.getFechaEntrega()));
         dto.setEstado(orden.getEstado());
         dto.setEtapaInicial("pendiente_corte".equalsIgnoreCase(orden.getEstado()) ? "Pendiente de corte" : orden.getEstado());
         dto.setRegistradoPor(orden.getRegistradoPor() != null ? orden.getRegistradoPor().getNombre() : null);
         dto.setTurno(orden.getTurno());
 
-        List<Lote> lotes = loteRepository.findByOrdenNumero(orden.getNumero());
-        if (!lotes.isEmpty()) {
-            dto.setLote(lotes.get(0).getCodigo());
-        } else {
-            dto.setLote("—");
-        }
+        dto.setLote(lote==null?"—":lote.getCodigo());
+        dto.setLoteId(lote==null?null:lote.getId());
 
         return dto;
     }

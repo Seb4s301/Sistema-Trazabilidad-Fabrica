@@ -36,7 +36,7 @@ public class AuthService {
             throw new BusinessException("CREDENCIALES_INVALIDAS", "Correo o contraseña incorrectos");
         }
 
-        if (!usuario.getActivo()) {
+        if (!Boolean.TRUE.equals(usuario.getActivo())) {
             throw new BusinessException("USUARIO_INACTIVO", "El usuario está inactivo. Contacta a soporte TI");
         }
 

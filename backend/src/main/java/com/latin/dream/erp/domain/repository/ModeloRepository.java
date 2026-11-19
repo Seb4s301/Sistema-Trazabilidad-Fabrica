@@ -12,6 +12,9 @@ import java.util.List;
 public interface ModeloRepository extends JpaRepository<Modelo, String> {
 
     List<Modelo> findByActivoTrue();
+    boolean existsByCodigoAndIdNot(String codigo,String id);
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query("select m from Modelo m where m.id=:id")
+    java.util.Optional<Modelo> bloquearPorId(@org.springframework.data.repository.query.Param("id") String id);
 
-    boolean existsByCodigo(String codigo);
 }

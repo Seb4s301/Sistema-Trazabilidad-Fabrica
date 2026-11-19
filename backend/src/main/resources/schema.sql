@@ -2,8 +2,8 @@
 -- Latin Dream · Esquema PostgreSQL (Supabase)
 -- Sistema de trazabilidad de producción — fábrica de colchones (Lima, Perú)
 --
--- IMPORTANTE: ejecutar este script en Supabase (SQL Editor) ANTES de arrancar
--- el backend, porque application.yml usa spring.jpa.hibernate.ddl-auto=validate.
+-- El backend aplica este script idempotente antes de validar Hibernate.
+-- Con DB_INIT_MODE=never, debe aplicarlo previamente la migración del despliegue.
 --
 -- Los IDs son VARCHAR(36) porque las entidades Java usan String (UUID en texto,
 -- ej. "550e8400-e29b-41d4-a716-446655440000"). Así el validador de Hibernate
@@ -138,3 +138,25 @@ CREATE INDEX IF NOT EXISTS idx_usuarios_correo ON usuarios(correo);
 -- ============================================================================
 -- Formato de error de la API: { "codigo": "...", "mensaje": "..." } en español
 -- ============================================================================
+
+-- Evolución compatible: borradores parciales y solicitudes idempotentes.
+ALTER TABLE ordenes ALTER COLUMN modelo_id DROP NOT NULL;
+ALTER TABLE ordenes ALTER COLUMN cantidad DROP NOT NULL;
+ALTER TABLE ordenes ALTER COLUMN prioridad DROP NOT NULL;
+ALTER TABLE ordenes ALTER COLUMN fecha_entrega DROP NOT NULL;
+ALTER TABLE ordenes ADD COLUMN IF NOT EXISTS solicitud_id VARCHAR(36);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_ordenes_solicitud ON ordenes(solicitud_id);
+
+ALTER TABLE despachos ADD COLUMN IF NOT EXISTS solicitud_id VARCHAR(36);
+ALTER TABLE despachos ADD COLUMN IF NOT EXISTS entregado_en TIMESTAMP;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_despachos_solicitud ON despachos(solicitud_id);
+CREATE INDEX IF NOT EXISTS idx_despacho_lotes_lote ON despacho_lotes(lote_id);
+
+CREATE TABLE IF NOT EXISTS liquidaciones_comision (
+    id VARCHAR(36) PRIMARY KEY, orden_id VARCHAR(36) NOT NULL UNIQUE REFERENCES ordenes(id),
+    periodo VARCHAR(7) NOT NULL, modelo VARCHAR(100) NOT NULL, categoria VARCHAR(50) NOT NULL, relleno VARCHAR(100) NOT NULL,
+    unidades INTEGER NOT NULL CHECK(unidades>0), precio_base NUMERIC(12,2) NOT NULL, porcentaje NUMERIC(5,2) NOT NULL,
+    monto NUMERIC(14,2) NOT NULL, liquidado_en TIMESTAMP NOT NULL, liquidado_por VARCHAR(36) NOT NULL REFERENCES usuarios(id),
+    pagado_en TIMESTAMP, pagado_por VARCHAR(36) REFERENCES usuarios(id), referencia_pago VARCHAR(200)
+);
+CREATE INDEX IF NOT EXISTS idx_liquidaciones_periodo ON liquidaciones_comision(periodo);

@@ -8,21 +8,24 @@ import java.time.LocalDate;
  */
 public class OrdenRequest {
 
-    @NotNull(message = "El modelo es obligatorio")
     private String modeloId; // UUID del modelo
 
-    @NotNull(message = "La cantidad es obligatoria")
     @Min(value = 1, message = "La cantidad mínima es 1")
     private Integer cantidad;
 
-    @NotBlank(message = "La prioridad es obligatoria")
+    @Pattern(regexp = "Alta|Normal|Baja", message = "Prioridad inválida")
     private String prioridad; // Alta, Normal, Baja
 
-    @NotNull(message = "La fecha de entrega es obligatoria")
     private LocalDate fechaEntrega;
 
     @Size(max = 1000, message = "Las observaciones no pueden exceder 1000 caracteres")
     private String observaciones;
+
+    @Pattern(regexp = "[0-9a-fA-F-]{36}")
+    private String solicitudId;
+
+    public String getSolicitudId() { return solicitudId; }
+    public void setSolicitudId(String solicitudId) { this.solicitudId = solicitudId; }
 
     // Getters y setters
     public String getModeloId() { return modeloId; }

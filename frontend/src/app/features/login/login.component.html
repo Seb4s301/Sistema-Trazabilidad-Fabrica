@@ -104,8 +104,10 @@
                 <input type="checkbox" formControlName="recordar">
                 <span>Recordarme</span>
               </label>
-              <button type="button" class="link-btn">¿Olvidaste tu contraseña?</button>
+              <button type="button" class="link-btn" (click)="mostrarAyuda = !mostrarAyuda" [attr.aria-expanded]="mostrarAyuda">¿Olvidaste tu contraseña?</button>
             </div>
+
+            <p *ngIf="mostrarAyuda" role="status">La recuperación de contraseña aún no está configurada. Comunícate con la persona responsable del sistema para recuperar tu acceso.</p>
 
             <!-- Error de credenciales -->
             <div class="alert-error" *ngIf="errorMessage" role="alert">

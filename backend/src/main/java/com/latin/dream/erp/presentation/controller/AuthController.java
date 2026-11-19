@@ -20,7 +20,7 @@ public class AuthController {
     private AuthService authService;
 
     // Si las credenciales son inválidas, el GlobalExceptionHandler responde
-    // { "codigo": "...", "mensaje": "..." } con HTTP 400.
+    // { "codigo": "...", "mensaje": "..." } con HTTP 401.
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
         AuthResponse response = authService.autenticar(request.getCorreo(), request.getPassword());

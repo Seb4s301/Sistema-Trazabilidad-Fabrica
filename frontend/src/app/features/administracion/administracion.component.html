@@ -1,0 +1,30 @@
+<h1 class="page-title">Modelos y tarifas</h1>
+<p>Los modelos usados en órdenes conservan sus especificaciones. Para una variante nueva, crea otro modelo.</p>
+<div *ngIf="error" class="alert alert-danger" role="alert">{{error}}</div><div *ngIf="mensaje" class="alert alert-success" role="status">{{mensaje}}</div>
+<p *ngIf="cargando">Cargando…</p>
+<div class="row g-4"><section class="col-xl-6"><div class="card p-3">
+<h2 class="h5">{{modelo.id?'Editar modelo':'Nuevo modelo'}}</h2>
+<form #modeloForm="ngForm" (ngSubmit)="guardarModelo()" class="row g-2">
+<label class="col-md-6">Código<input class="form-control" name="codigo" [(ngModel)]="modelo.codigo" required maxlength="20" [readonly]="modelo.usado"></label>
+<label class="col-md-6">Nombre<input class="form-control" name="nombre" [(ngModel)]="modelo.nombre" required maxlength="100" [readonly]="modelo.usado"></label>
+<label class="col-md-6">Categoría / plazas<input class="form-control" name="categoria" [(ngModel)]="modelo.categoria" required maxlength="50" [readonly]="modelo.usado"></label>
+<label class="col-md-6">Dimensiones<input class="form-control" name="dimensiones" [(ngModel)]="modelo.dimensiones" required maxlength="100" [readonly]="modelo.usado"></label>
+<label class="col-12">Relleno<input class="form-control" name="relleno" [(ngModel)]="modelo.relleno" required maxlength="100" [readonly]="modelo.usado"></label>
+<label class="col-12"><input name="activo" type="checkbox" [(ngModel)]="modelo.activo"> Disponible para nuevas órdenes</label>
+<p *ngIf="modelo.usado">Este modelo ya tiene órdenes; puedes cambiar su disponibilidad.</p>
+<div class="d-flex gap-2"><button class="btn btn-ld-gold" [disabled]="guardando||!modeloForm.valid">Guardar modelo</button><button type="button" class="btn btn-outline-dark" (click)="modelo=nuevoModelo()">Limpiar</button></div>
+</form>
+<div class="table-responsive mt-3"><table class="table"><thead><tr><th>Modelo</th><th>Disponible</th><th></th></tr></thead><tbody><tr *ngFor="let m of modelos"><td>{{m.codigo}} · {{m.nombre}} · {{m.categoria}}</td><td>{{m.activo?'Sí':'No'}}</td><td><button class="btn btn-sm btn-outline-dark" (click)="editarModelo(m)">Editar</button></td></tr></tbody></table></div>
+</div></section>
+<section class="col-xl-6"><div class="card p-3"><h2 class="h5">{{tarifa.id?'Editar tarifa':'Nueva tarifa'}}</h2>
+<p>Una nueva tarifa puede cerrar la vigencia anterior. Las liquidaciones ya registradas mantienen su importe.</p>
+<form #tarifaForm="ngForm" (ngSubmit)="guardarTarifa()" class="row g-2">
+<label class="col-12">Modelo<select class="form-select" name="modelo" [(ngModel)]="tarifa.modeloId" required [disabled]="!!tarifa.id"><option value="">Selecciona un modelo</option><option *ngFor="let m of modelos" [value]="m.id">{{m.codigo}} · {{m.nombre}} · {{m.categoria}}</option></select></label>
+<label class="col-md-6">Precio base ($)<input class="form-control" name="base" type="number" min="0" step="0.01" required [(ngModel)]="tarifa.precioBase"></label>
+<label class="col-md-6">Comisión (%)<input class="form-control" name="porcentaje" type="number" min="0" max="100" step="0.01" required [(ngModel)]="tarifa.porcentaje"></label>
+<label class="col-md-6">Vigente desde<input class="form-control" name="desde" type="date" required [(ngModel)]="tarifa.vigenteDesde"></label>
+<label class="col-md-6">Vigente hasta (opcional)<input class="form-control" name="hasta" type="date" [min]="tarifa.vigenteDesde" [(ngModel)]="tarifa.vigenteHasta"></label>
+<div class="d-flex gap-2"><button class="btn btn-ld-gold" [disabled]="guardando||!tarifaForm.valid">Guardar tarifa</button><button type="button" class="btn btn-outline-dark" (click)="tarifa=nuevaTarifa()">Limpiar</button></div>
+</form>
+<div class="table-responsive mt-3"><table class="table"><thead><tr><th>Modelo</th><th>Base / %</th><th>Vigencia</th><th></th></tr></thead><tbody><tr *ngFor="let t of tarifas"><td>{{t.modelo}}</td><td>{{t.precioBase|number:'1.2-2'}} / {{t.porcentaje}}%</td><td>{{t.vigenteDesde}} → {{t.vigenteHasta||'Abierta'}}</td><td><button class="btn btn-sm btn-outline-dark" (click)="editarTarifa(t)">Editar</button></td></tr></tbody></table></div>
+</div></section></div>

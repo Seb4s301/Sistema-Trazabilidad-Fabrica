@@ -20,13 +20,21 @@ public class NumeroOrdenService {
     private static final int LONGITUD_SEC = 4;
 
     private final OrdenRepository ordenRepository;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
-    public NumeroOrdenService(OrdenRepository ordenRepository) {
+    public NumeroOrdenService(OrdenRepository ordenRepository, org.springframework.jdbc.core.JdbcTemplate jdbcTemplate) {
         this.ordenRepository = ordenRepository;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
-    @Transactional
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.MANDATORY)
+    public void bloquearNumeracion() {
+        jdbcTemplate.execute("SELECT pg_advisory_xact_lock(127954, 1)");
+    }
+
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.MANDATORY)
     public String generarSiguiente() {
+        bloquearNumeracion();
         String anio = String.valueOf(java.time.Year.now().getValue());
         Integer maximo = ordenRepository.findMaxSecuenciaPorAnio(anio);
         int siguiente = (maximo == null ? 0 : maximo) + 1;

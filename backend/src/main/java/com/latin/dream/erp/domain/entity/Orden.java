@@ -27,17 +27,20 @@ public class Orden {
     @Column(nullable = false, length = 20, unique = true)
     private String numero; // OP-AAAA-NNNN
 
+    @Column(name = "solicitud_id", unique = true, length = 36)
+    private String solicitudId;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "modelo_id", nullable = false)
+    @JoinColumn(name = "modelo_id")
     private Modelo modelo;
 
-    @Column(nullable = false)
+    @Column
     private Integer cantidad;
 
-    @Column(nullable = false, length = 20)
+    @Column(length = 20)
     private String prioridad; // Alta, Normal, Baja
 
-    @Column(name = "fecha_entrega", nullable = false)
+    @Column(name = "fecha_entrega")
     private LocalDate fechaEntrega;
 
     @Column(length = 1000)
@@ -58,14 +61,6 @@ public class Orden {
 
     @Column(name = "actualizado_en")
     private LocalDateTime actualizadoEn;
-
-    public boolean esBorrador() {
-        return "borrador".equalsIgnoreCase(estado);
-    }
-
-    public boolean estaPendienteCorte() {
-        return "pendiente_corte".equalsIgnoreCase(estado);
-    }
 
     @PrePersist
     void onCreate() {

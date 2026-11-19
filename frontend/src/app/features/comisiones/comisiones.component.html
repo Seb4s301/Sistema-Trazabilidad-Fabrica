@@ -1,14 +1,17 @@
+<div *ngIf="errorCarga" class="alert alert-danger" role="alert">{{ errorCarga }}</div>
 <div class="page-header d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
   <div>
     <div class="eyebrow mb-1">COMISIONES / PRODUCTO</div>
     <h1 class="page-title">Gestión de Comisiones por Producto</h1>
-    <p class="page-subtitle">Visualiza, calcula y audita comisiones por venta y producción para cada modelo, categoría y estado de pago.</p>
+    <p class="page-subtitle">Consulta estimaciones por período. Liquida al completar la entrega y registra el pago con su referencia.</p>
   </div>
   <button type="button" class="btn btn-ld-gold" (click)="exportarReporte()">
     <span class="btn-icon">↓</span> Exportar Reporte de Comisiones
   </button>
 </div>
 
+<div class="d-flex gap-3 align-items-end mb-3"><label>Mes de creación de la orden<input type="month" class="form-control" [(ngModel)]="periodo" (change)="cargarComisiones()"></label><span>La liquidación requiere la entrega total de la orden.</span></div>
+<div *ngIf="mensaje" class="alert alert-success" role="status">{{mensaje}}</div>
 <!-- KPIs -->
 <div class="kpi-grid row g-3 mb-4">
   <div class="col-6 col-xl-3" *ngFor="let k of kpis">
@@ -28,7 +31,7 @@
     <div class="card ld-card">
       <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="card-title mb-0">Cálculo de comisiones por modelo</h5>
-        <span class="muted-small d-none d-md-inline">Octubre 2026</span>
+        <span class="muted-small d-none d-md-inline">{{periodo}}</span>
       </div>
 
       <!-- Tabla (escritorio) -->
@@ -36,31 +39,35 @@
         <table class="table ld-table align-middle mb-0">
           <thead>
             <tr>
-              <th>Tipo / Modelo</th>
+              <th>Orden / Modelo</th>
               <th>Categoría / Plaza</th>
               <th>Unidades</th>
               <th>Precio Base</th>
               <th>% Comisión</th>
               <th>Monto Total</th>
-              <th>Estado</th>
+              <th>Estado</th><th>Acciones</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let f of filas">
-              <td class="cell-strong">{{ f.modelo }}</td>
+              <td class="cell-strong">{{ f.tipo }} · {{ f.modelo }}</td>
               <td>{{ f.categoria }}</td>
               <td>{{ f.unidades }}</td>
               <td>{{ montoTexto(f.precioBase) }}</td>
               <td>{{ f.porcentaje }}%</td>
               <td class="cell-strong">{{ montoTexto(f.monto) }}</td>
-              <td><span class="pill" [ngClass]="claseEstado[f.estado]"><span class="pill-dot"></span>{{ f.estado }}</span></td>
+              <td><span class="pill" [ngClass]="claseEstado[f.estado]"><span class="pill-dot"></span>{{ f.estado }}</span></td><td><button class="btn btn-sm btn-outline-dark" *ngIf="f.puedeLiquidar" [disabled]="accionEnCurso" (click)="liquidar(f)">Liquidar</button>
+                <button class="btn btn-sm btn-outline-dark" *ngIf="f.estado === 'Pendiente'" [disabled]="accionEnCurso" (click)="abrirPago(f)">Registrar pago</button>
+                <small *ngIf="f.estado === 'Pagado'">{{f.referenciaPago}} · {{f.pagadoEn | date:'dd/MM/yyyy HH:mm'}}</small>
+                <small *ngIf="f.estado === 'Estimado' && !f.puedeLiquidar">Pendiente de entrega total</small>
+                <small *ngIf="f.estado === 'Sin tarifa'">Solicita a gerencia una tarifa vigente</small></td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="5" class="foot-total">Total</td>
               <td class="foot-amount">{{ montoTexto(totalMonto) }}</td>
-              <td></td>
+              <td colspan="2"></td>
             </tr>
           </tfoot>
         </table>
@@ -73,6 +80,11 @@
             <span class="cell-strong">{{ f.modelo }} · {{ f.categoria }}</span>
             <span class="pill" [ngClass]="claseEstado[f.estado]"><span class="pill-dot"></span>{{ f.estado }}</span>
           </div>
+          <div class="my-2"><button class="btn btn-sm btn-outline-dark" *ngIf="f.puedeLiquidar" [disabled]="accionEnCurso" (click)="liquidar(f)">Liquidar</button>
+                <button class="btn btn-sm btn-outline-dark" *ngIf="f.estado === 'Pendiente'" [disabled]="accionEnCurso" (click)="abrirPago(f)">Registrar pago</button>
+                <small *ngIf="f.estado === 'Pagado'">{{f.referenciaPago}} · {{f.pagadoEn | date:'dd/MM/yyyy HH:mm'}}</small>
+                <small *ngIf="f.estado === 'Estimado' && !f.puedeLiquidar">Pendiente de entrega total</small>
+                <small *ngIf="f.estado === 'Sin tarifa'">Solicita a gerencia una tarifa vigente</small></div>
           <div class="cc-grid">
             <div><span class="lbl">Unidades</span><span class="val">{{ f.unidades }}</span></div>
             <div><span class="lbl">Precio base</span><span class="val">{{ montoTexto(f.precioBase) }}</span></div>
@@ -89,7 +101,7 @@
     <div class="card ld-card dist-panel">
       <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="card-title mb-0">Distribución de comisiones</h5>
-        <span class="muted-small">Octubre 2026</span>
+        <span class="muted-small">{{periodo}}</span>
       </div>
       <div class="card-body">
 
@@ -128,3 +140,11 @@
   </div>
 
 </div>
+
+<div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index:1100;background:rgba(0,0,0,.5)" *ngIf="pago" role="dialog" aria-modal="true">
+<form class="card p-4 m-3" style="max-width:500px;width:100%" (ngSubmit)="registrarPago()">
+<h2 class="h5">Registrar pago · {{pago.tipo}}</h2><p>Importe liquidado: {{montoTexto(pago.monto)}}. Este registro documenta un pago ya realizado.</p>
+<label>Referencia de operación / comprobante<input class="form-control" name="referencia" [(ngModel)]="referencia" required maxlength="200"></label>
+<p *ngIf="errorCarga" class="text-danger" role="alert">{{errorCarga}}</p>
+<div class="d-flex gap-2 mt-3"><button class="btn btn-ld-gold" [disabled]="accionEnCurso || !referencia.trim()">Registrar pago</button><button type="button" class="btn btn-outline-dark" [disabled]="accionEnCurso" (click)="pago=null">Cancelar</button></div>
+</form></div>

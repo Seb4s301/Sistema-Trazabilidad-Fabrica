@@ -25,7 +25,7 @@ El proyecto implementa una arquitectura desacoplada en **N capas**, garantizando
 ┌─────────────────────────────────────────────────────────────┐
 │                 CAPA DE PRESENTACIÓN                        │
 │   • Controllers REST (Spring Web)                           │
-│   • UI / Single Page Application (Angular 16 + Bootstrap 5) │
+│   • UI / Single Page Application (Angular 17 + Bootstrap 5) │
 └──────────────────────────────┬──────────────────────────────┘
                                │ (Consume DTOs)
                                ▼
@@ -212,7 +212,7 @@ Prefijo base: `http://localhost:8080/api/v1`
 
 ## 6. Pila Tecnológica
 
-- **Frontend**: Angular 16, TypeScript, SCSS modular, Bootstrap 5, Chart.js.
+- **Frontend**: Angular 17, TypeScript, SCSS modular, Bootstrap 5, Chart.js.
 - **Backend**: Java 17/24, Spring Boot 3.5.x, Spring Data JPA, Spring Security, Hibernate 6.
 - **Librerías Auxiliares**: Apache POI 5.2.5, Apache Commons Lang3 3.14.0, Logback, JJWT 0.12.3, Lombok.
 - **Base de Datos**: PostgreSQL 17 alojado en **Supabase**.
@@ -227,28 +227,12 @@ Prefijo base: `http://localhost:8080/api/v1`
 - Node.js 18+ y npm.
 - Acceso a internet para conectar con Supabase PostgreSQL.
 
-### 1. Variables de Entorno (`.env`):
-Crear o verificar el archivo `.env` en la raíz del repositorio:
-```ini
-DB_URL=jdbc:postgresql://aws-0-us-east-2.pooler.supabase.com:5432/postgres?sslmode=require
-DB_USER=postgres.dxpmyqjdcmbcjqouzrvz
-DB_PASSWORD=sistema_LatinDreams
-SERVER_PORT=8080
-API_PREFIX=/api/v1
-CORS_ALLOWED_ORIGINS=http://localhost:4200,http://127.0.0.1:4200,http://localhost:4201
-JWT_SECRET=2ab2c244-c111-464c-a289-a622d7bc0ae3
-JWT_EXPIRATION=86400000
-TZ=America/Lima
-APP_SEED_ENABLED=true
-APP_SEED_PASSWORD=Latin2026!
-```
-
 ### 2. Ejecutar el Backend:
 ```bash
 cd backend
 mvn spring-boot:run
 ```
-*El backend iniciará en `http://localhost:8080/api/v1` y poblará automáticamente las tablas en la primera ejecución.*
+*El backend iniciará en `http://localhost:8080/api/v1` y aplicará `backend/src/main/resources/schema.sql` y validará las tablas. La semilla solo se activa con `APP_SEED_ENABLED=true`.*
 
 ### 3. Ejecutar el Frontend:
 ```bash
@@ -262,13 +246,39 @@ npm run start -- --port 4200
 
 ## 8. Usuarios y Credenciales de Acceso
 
-La base de datos cuenta con los siguientes usuarios semilla preconfigurados:
+Con `APP_SEED_ENABLED=true` se crean los siguientes usuarios si la tabla está vacía. Sus contraseñas corresponden a `APP_SEED_PASSWORD`:
 
 | Nombre | Correo Electrónico | Contraseña | Rol / Permiso |
 |---|---|---|---|
-| **María Rojas** | `maria.rojas@latindream.com` | `Latin2026!` | **Supervisora** (Acceso global de planta) |
-| **José Martínez** | `jose.martinez@latindream.com` | `Latin2026!` | **Gerente** (Dirección y comisiones) |
-| **Valeria Soto** | `valeria.soto@latindream.com` | `Latin2026!` | **Vendedora** (Ingreso de órdenes) |
-| **Roberto Díaz** | `roberto.diaz@latindream.com` | `Latin2026!` | **Encargado de Área** (Avances de lote) |
-| **Lucía Fernández** | `lucia.fernandez@latindream.com` | `Latin2026!` | **Contabilidad** (Auditoría de comisiones) |
-| **Diego Ruiz** | `diego.ruiz@latindream.com` | `Latin2026!` | **Conductor** (Despacho y entrega) |
+| **María Rojas** | `maria.rojas@latindream.com` | `APP_SEED_PASSWORD` | **Supervisora** (Acceso global de planta) |
+| **José Martínez** | `jose.martinez@latindream.com` | `APP_SEED_PASSWORD` | **Gerente** (Dirección y comisiones) |
+| **Valeria Soto** | `valeria.soto@latindream.com` | `APP_SEED_PASSWORD` | **Vendedora** (Ingreso de órdenes) |
+| **Roberto Díaz** | `roberto.diaz@latindream.com` | `APP_SEED_PASSWORD` | **Encargado de Área** (Avances de lote) |
+| **Lucía Fernández** | `lucia.fernandez@latindream.com` | `APP_SEED_PASSWORD` | **Contabilidad** (Auditoría de comisiones) |
+| **Diego Ruiz** | `diego.ruiz@latindream.com` | `APP_SEED_PASSWORD` | **Conductor** (Despacho y entrega) |
+
+## Correcciones y operación
+
+- Configura una clave JWT aleatoria de al menos 32 bytes en `JWT_SECRET`. Los secretos publicados anteriormente deben rotarse en el proveedor; quitarlos del repositorio no los revoca.
+- `APP_SEED_ENABLED` está desactivado por defecto y controla toda la carga de datos de prueba.
+- Cada modelo define su categoría, dimensiones y relleno; la orden usa esas especificaciones.
+- Producción avanza Corte → Ensamblaje → Tapizado → Calidad → Listo. La salida de Calidad exige `aprobado`; `rechazado` permite volver a Tapizado.
+- Las comisiones se consultan por mes de creación de la orden y usan la tarifa vigente en su fecha de registro. La liquidación se habilita solo después de la entrega total y congela cantidades, precio, porcentaje e importe. El pago requiere una referencia y conserva usuario y fecha. Pantalla y Excel comparten el cálculo y el período.
+- En producción, sirve el frontend junto a un proxy para `/api/v1` hacia el backend.
+- Comprobaciones: `cd backend; mvn test` y `cd frontend; npm test; npm run build`.
+
+## Flujos operativos completos
+
+- **Borradores:** admiten campos parciales. Se pueden retomar desde Órdenes, editar y eliminar; la confirmación exige todos los datos y una fecha de entrega vigente. El creador original se conserva en la auditoría.
+- **Creación directa:** guarda y confirma dentro de una transacción. `solicitudId` permite repetir una petición sin duplicarla; si cambian los datos, usa otro identificador.
+- **Producción:** ofrece Kanban y lista en escritorio, instrucciones de fabricación e historial de cada lote. Al completar todas las entregas de una orden, sale del tablero activo. El historial sigue disponible desde Órdenes.
+- **Despachos:** permite varios lotes y, para cada uno, lote completo o cantidad parcial. Al programar reserva las unidades; editar un despacho programado recalcula la reserva. Cancelar antes de salir libera el saldo. Las transiciones son Programado → En tránsito → Entregado, o Programado → Cancelado. Entregado y Cancelado son terminales.
+- **Despachos anteriores sin asociaciones:** se pueden asociar sus lotes desde Editar, incluso si ya estaban en tránsito. No se permite confirmar entregas sin lotes.
+- **Comisiones:** Estimado / Sin tarifa → Pendiente (liquidado, tras entrega total) → Pagado (con referencia). No se ejecutan transferencias bancarias: se registra un pago realizado.
+- **Modelos y tarifas:** gerencia y supervisión gestionan el catálogo desde `/administracion`. Las especificaciones de modelos usados quedan protegidas; pueden desactivarse. Las vigencias de tarifas no se solapan y los importes liquidados permanecen inmutables.
+- **Acceso:** sin Recordarme, la sesión usa `sessionStorage`; al marcarlo usa `localStorage`. La recuperación de contraseña queda pendiente de definición; la interfaz informa de ello.
+- **Encabezado:** búsqueda por orden o modelo y consulta de alertas de retraso actuales.
+
+### Comprobaciones locales
+
+`mvn test` ejecuta pruebas de permisos y regresión, además de recorridos con repositorios y transacciones reales sobre H2 aislada. El bloqueo asesor específico de PostgreSQL se sustituye en esas pruebas; nunca se escriben datos de prueba en Supabase. `npm test` comprueba edición, reintentos, sesiones y cantidades de despacho. `npm run build` valida las plantillas Angular y genera producción.

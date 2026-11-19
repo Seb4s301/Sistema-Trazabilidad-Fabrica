@@ -1,3 +1,4 @@
+import { HistorialComponent } from '../../shared/historial.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,6 +11,6 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [OrdenesComponent],
-  imports: [CommonModule, FormsModule, RouterModule.forChild(routes)]
+  imports: [HistorialComponent,CommonModule, FormsModule, RouterModule.forChild(routes)]
 })
 export class OrdenesModule {}

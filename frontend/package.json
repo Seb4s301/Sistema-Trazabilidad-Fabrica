@@ -1,13 +1,13 @@
 {
   "name": "erp-produccion-frontend",
   "version": "1.0.0",
-  "description": "Latin Dream - ERP de producción (Angular + Bootstrap)",
+  "description": "Latin Dream - ERP de producci\u00c3\u00b3n (Angular + Bootstrap)",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "node --test tests/regresiones.test.cjs"
   },
   "private": true,
   "dependencies": {

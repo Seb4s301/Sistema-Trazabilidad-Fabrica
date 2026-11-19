@@ -10,8 +10,11 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "target": "ES2022",
-    "module": "commonjs",
-    "lib": ["ES2022", "dom"],
+    "module": "ES2022",
+    "lib": [
+      "ES2022",
+      "dom"
+    ],
     "moduleResolution": "node",
     "sourceMap": true,
     "resolveJsonModule": true,

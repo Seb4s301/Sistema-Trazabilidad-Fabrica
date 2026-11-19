@@ -12,6 +12,10 @@ spring:
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: ${DB_INIT_MODE:always}
+      encoding: UTF-8
   jpa:
     hibernate:
       ddl-auto: ${JPA_DDL_AUTO:validate}
@@ -25,12 +29,12 @@ spring:
     timezone: America/Lima
 
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT:8081}
 
 # Seguridad JWT
 jwt:
   # ⚠️ En producción usa una clave de al menos 32 caracteres (256 bits)
-  secret: ${JWT_SECRET:c2VjcmV0LXJhbmRvbS1wYXJhLXBlcnV0b3MtdG90b2Rv}
+  secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION:86400000} # 24 horas en milisegundos
 
 # Prefijo de API
@@ -45,8 +49,8 @@ app:
 # Semilla de usuarios de prueba (SOLO DESARROLLO)
 # Se crea solo si la tabla usuarios está vacía. En producción: enabled: false
   seed:
-    enabled: ${APP_SEED_ENABLED:true}
-    password: ${APP_SEED_PASSWORD:Latin2026!}
+    enabled: ${APP_SEED_ENABLED:false}
+    password: ${APP_SEED_PASSWORD:}
     usuarios:
       - nombre: María Rojas
         correo: maria.rojas@latindream.com

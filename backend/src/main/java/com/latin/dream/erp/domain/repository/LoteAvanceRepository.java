@@ -7,6 +7,8 @@ import java.util.List;
 
 @Repository
 public interface LoteAvanceRepository extends JpaRepository<LoteAvance, String> {
-    List<LoteAvance> findByLoteIdOrderByInicioDesc(String loteId);
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"lote", "responsable"})
     List<LoteAvance> findAllByOrderByInicioDesc();
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths={"responsable"})
+    List<LoteAvance> findByLoteIdOrderByInicioDesc(String loteId);
 }

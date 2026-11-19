@@ -24,7 +24,7 @@ public class CatalogoController {
 
     @GetMapping
     public ResponseEntity<Map<String, Object>> getCatalogos() {
-        List<Modelo> modelos = modeloRepository.findAll();
+        List<Modelo> modelos = modeloRepository.findByActivoTrue();
 
         List<Map<String, Object>> dimensiones = List.of(
             Map.of("id", "1.5", "nombre", "1.5 Plazas", "ancho_cm", 120, "largo_cm", 190, "altura_cm", 26, "medidas", "1.5 Plazas: 120 × 190 cm · Altura: 26 cm"),

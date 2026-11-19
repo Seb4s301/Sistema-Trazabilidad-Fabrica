@@ -1,11 +1,12 @@
+<div *ngIf="errorCarga" class="alert alert-danger" role="alert">{{ errorCarga }}</div>
 <div class="page-header mb-4">
   <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
     <div>
       <div class="eyebrow mb-1">ÓRDENES / NUEVA</div>
-      <h1 class="page-title">Nueva orden de fabricación</h1>
+      <h1 class="page-title">{{ borradorId ? "Editar borrador" : "Nueva orden de fabricación" }}</h1>
       <p class="page-subtitle">Define el producto y programa su ingreso a producción.</p>
     </div>
-    <span class="pill pill-slate"><span class="pill-dot"></span>Borrador sin guardar</span>
+    <span class="pill pill-slate"><span class="pill-dot"></span>{{ borradorId ? numeroOrden : "Borrador sin guardar" }}</span>
   </div>
 </div>
 
@@ -53,27 +54,12 @@
       <!-- Dimensiones -->
       <div class="mb-4">
         <label class="field-label">Dimensiones / Plazas <span class="req">*</span></label>
-        <div class="chip-row">
-          <button type="button" class="chip" *ngFor="let d of dimensiones"
-                  [class.selected]="dimensionId === d.id"
-                  (click)="dimensionId = d.id">
-            {{ d.nombre }}
-          </button>
-        </div>
-        <div class="field-help" *ngIf="dimensionSeleccionada">{{ dimensionSeleccionada.medidas }}</div>
+        <div class="form-control">{{ modeloSeleccionado?.dimensiones || 'Selecciona un modelo' }}</div>
       </div>
-
-      <!-- Relleno -->
       <div class="mb-4">
-        <label class="field-label">Tipo de núcleo / Relleno <span class="req">*</span></label>
-        <div class="radio-cards">
-          <label class="radio-card" *ngFor="let r of rellenos"
-                 [class.selected]="rellenoId === r.id">
-            <input type="radio" name="relleno" [value]="r.id" [(ngModel)]="rellenoId" hidden>
-            <span class="radio-title">{{ r.nombre }}</span>
-            <span class="radio-desc">{{ r.descripcion }}</span>
-          </label>
-        </div>
+        <label class="field-label">Tipo de núcleo / Relleno</label>
+        <div class="form-control">{{ modeloSeleccionado?.relleno || 'Selecciona un modelo' }}</div>
+        <div class="field-help">Las especificaciones corresponden al modelo del catálogo.</div>
       </div>
 
       <!-- Cantidad -->
@@ -121,7 +107,7 @@
       <!-- Observaciones -->
       <div class="mb-2">
         <label class="field-label">Observaciones de fabricación</label>
-        <textarea class="form-control" rows="4" [(ngModel)]="observaciones"
+        <textarea class="form-control" rows="4" maxlength="1000" [(ngModel)]="observaciones"
                   placeholder="Indicaciones para los responsables de cada etapa..."></textarea>
         <div class="field-help">Visibles para los responsables de cada etapa.</div>
       </div>
@@ -145,11 +131,11 @@
         </div>
         <div class="confirm-item">
           <span class="lbl">Dimensión</span>
-          <span class="val">{{ dimensionSeleccionada?.nombre || '—' }}</span>
+          <span class="val">{{ modeloSeleccionado?.categoria || '—' }}</span>
         </div>
         <div class="confirm-item">
           <span class="lbl">Relleno</span>
-          <span class="val">{{ rellenoSeleccionado?.nombre || '—' }}</span>
+          <span class="val">{{ modeloSeleccionado?.relleno || '—' }}</span>
         </div>
         <div class="confirm-item">
           <span class="lbl">Cantidad</span>
@@ -178,18 +164,19 @@
     <div class="action-bar d-flex flex-wrap justify-content-between align-items-center gap-2 mt-4">
       <span class="required-note">Los campos con * son obligatorios.</span>
       <div class="action-buttons d-flex flex-wrap gap-2">
+        <button class="btn btn-outline-dark" *ngIf="paso > 1" (click)="anterior()" [disabled]="guardando">Anterior</button>
         <button class="btn btn-outline-secondary" (click)="cancelar()">Cancelar</button>
         <button class="btn btn-outline-dark" (click)="guardarBorrador()" [disabled]="guardando || !esBorradorValido">
           Guardar borrador
         </button>
 
         <button class="btn btn-outline-dark" *ngIf="paso < 3" (click)="siguiente()"
-                [disabled]="(paso === 1 && !esPaso1Completo) || (paso === 2 && (!fechaEntrega || !prioridad))">
+                [disabled]="(paso === 1 && !esPaso1Completo) || (paso === 2 && !esCompleto)">
           Siguiente
         </button>
 
         <button class="btn btn-ld-gold" *ngIf="paso === 3" (click)="crearOrden()"
-                [disabled]="guardando || !esCompleto">
+                [disabled]="guardando || cargandoBorrador || !esCompleto">
           Crear orden de fabricación
         </button>
       </div>
@@ -211,15 +198,15 @@
       </div>
       <div class="summary-row">
         <span class="lbl">Dimensión</span>
-        <span class="val">{{ dimensionSeleccionada?.nombre || '—' }}</span>
+        <span class="val">{{ modeloSeleccionado?.categoria || '—' }}</span>
       </div>
-      <div class="summary-row" *ngIf="dimensionSeleccionada">
+      <div class="summary-row" *ngIf="modeloSeleccionado">
         <span class="lbl">Medidas</span>
-        <span class="val small">{{ dimensionSeleccionada.medidas }}</span>
+        <span class="val small">{{ modeloSeleccionado.dimensiones }}</span>
       </div>
       <div class="summary-row">
         <span class="lbl">Relleno</span>
-        <span class="val">{{ rellenoSeleccionado?.nombre || '—' }}</span>
+        <span class="val">{{ modeloSeleccionado?.relleno || '—' }}</span>
       </div>
       <div class="summary-row">
         <span class="lbl">Cantidad</span>

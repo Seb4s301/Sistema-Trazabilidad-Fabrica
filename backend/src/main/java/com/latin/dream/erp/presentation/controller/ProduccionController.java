@@ -29,8 +29,11 @@ public class ProduccionController {
         return ResponseEntity.ok(produccionService.getLotes());
     }
 
+    @GetMapping("/lotes/{id}/historial")
+    public ResponseEntity<?> historial(@PathVariable String id) { return ResponseEntity.ok(produccionService.historialLote(id)); }
+
     @PostMapping("/avances")
-    public ResponseEntity<Map<String, Object>> registrarAvance(@RequestBody Map<String, Object> payload,
+    public ResponseEntity<Map<String, Object>> registrarAvance(@jakarta.validation.Valid @RequestBody com.latin.dream.erp.application.dto.AvanceRequest payload,
                                                                @UsuarioActual Usuario usuario) {
         return ResponseEntity.ok(produccionService.registrarAvance(payload, usuario));
     }

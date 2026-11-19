@@ -7,7 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -30,16 +30,25 @@ public class ComisionesController {
     }
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getComisiones() {
-        return ResponseEntity.ok(comisionesService.getComisionesData());
+    public ResponseEntity<Map<String, Object>> getComisiones(@RequestParam(required=false) String periodo) {
+        return ResponseEntity.ok(comisionesService.getComisionesData(ComisionesService.periodo(periodo)));
     }
 
     @GetMapping("/reporte/excel")
-    public ResponseEntity<byte[]> exportarReporteExcel() {
-        byte[] excelBytes = reporteExcelService.exportarReporteComisiones();
+    public ResponseEntity<byte[]> exportarReporteExcel(@RequestParam(required=false) String periodo) {
+        byte[] excelBytes = reporteExcelService.exportarReporteComisiones(ComisionesService.periodo(periodo));
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"Reporte_Comisiones_LatinDream.xlsx\"")
             .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
             .body(excelBytes);
+    }
+    @PostMapping("/ordenes/{id}/liquidar")
+    public ResponseEntity<?> liquidar(@PathVariable String id,@com.latin.dream.erp.crosscutting.annotation.UsuarioActual com.latin.dream.erp.domain.entity.Usuario usuario) {
+        return ResponseEntity.ok(comisionesService.liquidar(id,usuario));
+    }
+    @PostMapping("/liquidaciones/{id}/pago")
+    public ResponseEntity<?> pagar(@PathVariable String id,@RequestBody Map<String,String> body,
+            @com.latin.dream.erp.crosscutting.annotation.UsuarioActual com.latin.dream.erp.domain.entity.Usuario usuario) {
+        comisionesService.pagar(id,body.get("referencia"),usuario); return ResponseEntity.ok(Map.of("mensaje","Pago registrado"));
     }
 }

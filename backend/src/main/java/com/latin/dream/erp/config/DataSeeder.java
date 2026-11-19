@@ -48,6 +48,10 @@ public class DataSeeder implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
+        if (!seedProperties.isEnabled()) return;
+        if (seedProperties.getPassword() == null || seedProperties.getPassword().isBlank()) {
+            throw new IllegalStateException("APP_SEED_PASSWORD es obligatorio cuando APP_SEED_ENABLED=true");
+        }
         seedUsuarios();
         seedModelos();
         seedPreciosComision();
@@ -139,12 +143,11 @@ public class DataSeeder implements ApplicationRunner {
         Modelo pr = modelos.stream().filter(m -> "PR-004".equals(m.getCodigo())).findFirst().orElse(modelos.get(0));
 
         Usuario u1 = usuarios.get(0);
-        Usuario u2 = usuarios.size() > 1 ? usuarios.get(1) : u1;
         LocalDate hoy = LocalDate.now();
 
         Object[][] ordenesData = {
             {"OP-2026-0420", cp, 120, "Alta", hoy.plusDays(4), "pendiente_corte", "Corte", "LT-2610-0420", false},
-            {"OP-2026-0419", es, 60, "Normal", hoy.plusDays(2), "en_proceso", "Corte", "LT-2610-0419", false},
+            {"OP-2026-0419", es, 60, "Normal", hoy.plusDays(2), "pendiente_corte", "Corte", "LT-2610-0419", false},
             {"OP-2026-0418", cp, 180, "Alta", hoy.minusDays(1), "en_proceso", "Ensamblaje", "LT-2610-0418", true},
             {"OP-2026-0417", dr, 80, "Normal", hoy.plusDays(3), "en_proceso", "Ensamblaje", "LT-2610-0417", false},
             {"OP-2026-0416", pr, 110, "Baja", hoy.plusDays(5), "en_proceso", "Tapizado", "LT-2610-0416", false},

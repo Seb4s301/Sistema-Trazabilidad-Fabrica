@@ -1,3 +1,4 @@
+import { AuthService } from '../../core/auth.service';
 import { Component, OnInit, inject } from '@angular/core';
 import { DespachosService, DespachosData, Despacho } from '../../core/services/despachos.service';
 
@@ -8,7 +9,12 @@ import { DespachosService, DespachosData, Despacho } from '../../core/services/d
 })
 export class DespachoComponent implements OnInit {
 
+  public authService = inject(AuthService);
+
   private despachosService = inject(DespachosService);
+
+  programarVisible = false;
+  editando: Despacho | null = null;
 
   tituloFecha = '';
   resumen = '';
@@ -26,12 +32,14 @@ export class DespachoComponent implements OnInit {
   historial: DespachosData['historial'] = [];
   banner = '';
   cargando = false;
+  errorCarga = '';
 
   ngOnInit(): void {
     this.cargarDespachos();
   }
 
   cargarDespachos(): void {
+    this.errorCarga = '';
     this.cargando = true;
     this.despachosService.getDespachos().subscribe({
       next: (data) => {
@@ -40,17 +48,13 @@ export class DespachoComponent implements OnInit {
         this.banner = data.banner;
         this.kpis = data.kpis;
         this.despachos = data.despachos;
+        if (this.detalleAbierto) this.detalleAbierto = data.despachos.find(d => d.codigo === this.detalleAbierto?.codigo) || null;
         this.historial = data.historial;
         this.cargando = false;
       },
       error: () => {
-        const demo = this.despachosService.getDemoData();
-        this.tituloFecha = demo.tituloFecha;
-        this.resumen = demo.resumen;
-        this.banner = demo.banner;
-        this.kpis = demo.kpis;
-        this.despachos = demo.despachos;
-        this.historial = demo.historial;
+        this.errorCarga = 'No se pudieron cargar los datos. Comprueba la conexión y tus permisos.';
+        this.kpis = []; this.despachos = []; this.historial = [];
         this.cargando = false;
       }
     });
@@ -60,7 +64,8 @@ export class DespachoComponent implements OnInit {
     return this.despachos.filter(d =>
       (!this.filtroEstado || d.estado === this.filtroEstado) &&
       (!this.filtroCliente || d.cliente === this.filtroCliente) &&
-      (!this.filtroVehiculo || d.vehiculo === this.filtroVehiculo)
+      (!this.filtroVehiculo || d.vehiculo === this.filtroVehiculo) &&
+      (!this.filtroFecha || d.fecha_salida === this.filtroFecha)
     );
   }
 
@@ -75,13 +80,14 @@ export class DespachoComponent implements OnInit {
   estadoLabel(e: string): string {
     if (e === 'programado') return 'Programado';
     if (e === 'transito') return 'En tránsito';
-    return 'Entregado';
+    if (e === 'cancelado') return 'Cancelado';
+    return e === 'entregado' ? 'Entregado' : e;
   }
 
   claseEstado(e: string): string {
     if (e === 'programado') return 'pill-warning';
     if (e === 'transito') return 'pill-slate';
-    return 'pill-success';
+    return e === 'cancelado' ? 'pill-danger' : 'pill-success';
   }
 
   claseHistorial(estado: string): string {
@@ -90,13 +96,15 @@ export class DespachoComponent implements OnInit {
     return 'pill-warning';
   }
 
+  programar(d: Despacho | null = null): void { this.editando = d; this.programarVisible = true; }
+  onGuardado(): void { this.programarVisible = false; this.editando = null; this.cargarDespachos(); }
+  puedeEditar(d: Despacho): boolean { return this.authService.puedeGestionarDespacho() && (d.estado === 'programado' || (d.estado === 'transito' && !d.lotes.length)); }
   abrirDetalle(d: Despacho): void {
     this.detalleAbierto = this.detalleAbierto?.codigo === d.codigo ? null : d;
   }
 
   abrirModalEstado(d: Despacho): void {
     this.despachoSeleccionado = d;
-    this.nuevoEstadoModal = d.estado;
     this.modalEstadoVisible = true;
   }
 
@@ -110,9 +118,5 @@ export class DespachoComponent implements OnInit {
     this.cargarDespachos(); // Recargar datos
   }
 
-  aplicarFiltros(): void {
-    // Los filtros ya están enlazados con [(ngModel)]
-  }
 
-  nuevoEstadoModal = 'programado';
 }

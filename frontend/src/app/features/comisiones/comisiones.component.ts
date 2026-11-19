@@ -10,24 +10,30 @@ export class ComisionesComponent implements OnInit {
 
   private comisionesService = inject(ComisionesService);
 
+  periodo = [new Date().getFullYear(), String(new Date().getMonth() + 1).padStart(2, '0')].join('-');
+  accionEnCurso = false; pago: ComisionFila | null = null; referencia = ''; mensaje = '';
   kpis: ComisionesData['kpis'] = [];
   filas: ComisionFila[] = [];
   barrasModelo: DistribucionItem[] = [];
   barrasRelleno: DistribucionItem[] = [];
   cargando = false;
+  errorCarga = '';
 
   ngOnInit(): void {
     this.cargarComisiones();
   }
 
   cargarComisiones(): void {
+    this.errorCarga = '';
     this.cargando = true;
-    this.comisionesService.getComisiones().subscribe({
+    this.comisionesService.getComisiones(this.periodo).subscribe({
       next: (data) => {
         this.aplicarDatos(data);
       },
       error: () => {
-        this.aplicarDatos(this.comisionesService.getDemoData());
+        this.errorCarga = 'No se pudieron cargar los datos. Comprueba la conexión y tus permisos.';
+        this.kpis = []; this.filas = []; this.barrasModelo = []; this.barrasRelleno = [];
+        this.cargando = false;
       }
     });
   }
@@ -54,9 +60,10 @@ export class ComisionesComponent implements OnInit {
 
   get claseEstado(): Record<string, string> {
     return {
-      'Pagado': 'pill-success',
+      'Estimado': 'pill-slate',
+      'Sin tarifa': 'pill-warning',
       'Pendiente': 'pill-warning',
-      'En revisión': 'pill-slate'
+      'Pagado': 'pill-success'
     };
   }
 
@@ -65,7 +72,7 @@ export class ComisionesComponent implements OnInit {
   }
 
   exportarReporte(): void {
-    this.comisionesService.exportarReporteExcel().subscribe({
+    this.comisionesService.exportarReporteExcel(this.periodo).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -74,10 +81,21 @@ export class ComisionesComponent implements OnInit {
         a.click();
         window.URL.revokeObjectURL(url);
       },
-      error: (err) => console.error('Error al exportar reporte Excel', err)
+      error: () => { this.errorCarga = 'No se pudo exportar el reporte.'; }
     });
   }
 
+  liquidar(f: ComisionFila): void {
+    if (this.accionEnCurso || !f.puedeLiquidar || !confirm('¿Liquidar la comisión de ' + f.tipo + ' por ' + this.montoTexto(f.monto) + '? El importe quedará fijado.')) return;
+    this.accionEnCurso = true; this.errorCarga = ''; this.mensaje = '';
+    this.comisionesService.liquidar(f.ordenId).subscribe({ next: () => { this.accionEnCurso = false; this.mensaje = 'Liquidación registrada.'; this.cargarComisiones(); }, error: e => { this.accionEnCurso = false; this.errorCarga = e?.error?.mensaje || 'No se pudo liquidar.'; } });
+  }
+  abrirPago(f: ComisionFila): void { this.pago = f; this.referencia = ''; this.errorCarga = ''; }
+  registrarPago(): void {
+    if (!this.pago?.liquidacionId || !this.referencia.trim() || this.accionEnCurso) return;
+    this.accionEnCurso = true;
+    this.comisionesService.pagar(this.pago.liquidacionId, this.referencia).subscribe({ next: () => { this.accionEnCurso = false; this.pago = null; this.mensaje = 'Pago registrado.'; this.cargarComisiones(); }, error: e => { this.accionEnCurso = false; this.errorCarga = e?.error?.mensaje || 'No se pudo registrar el pago.'; } });
+  }
   porcentajeBarra(valor: number, total: number): number {
     if (!total) return 0;
     return Math.round((valor / total) * 100);

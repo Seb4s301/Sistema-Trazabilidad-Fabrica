@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -39,6 +37,9 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Value("${app.cors.allowed-origins:http://localhost:4200,http://127.0.0.1:4200,http://localhost:4201,http://127.0.0.1:4201}")
     private String[] corsAllowedOrigins;
 
+    @Value("${api.prefix:/api/v1}")
+    private String apiPrefix;
+
     public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
     }
@@ -46,11 +47,6 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
     }
 
     @Bean
@@ -72,10 +68,22 @@ public class SecurityConfig implements WebMvcConfigurer {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/api/v1/**").permitAll()
-                .anyRequest().permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.POST, apiPrefix + "/auth/login").permitAll()
+                .requestMatchers(apiPrefix + "/administracion/**").hasAnyAuthority("gerente", "supervisora")
+                .requestMatchers(org.springframework.http.HttpMethod.POST, apiPrefix + "/comisiones/**").hasAnyAuthority("gerente", "supervisora", "contabilidad", "caja_chica")
+                .requestMatchers(org.springframework.http.HttpMethod.POST, apiPrefix + "/despachos/**").hasAnyAuthority("gerente", "supervisora", "conductor")
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, apiPrefix + "/despachos/**").hasAnyAuthority("gerente", "supervisora", "conductor")
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, apiPrefix + "/ordenes/**").hasAnyAuthority("gerente", "supervisora", "vendedora")
+                .requestMatchers(org.springframework.http.HttpMethod.DELETE, apiPrefix + "/ordenes/**").hasAnyAuthority("gerente", "supervisora", "vendedora")
+                .requestMatchers(apiPrefix + "/comisiones/**").hasAnyAuthority("gerente", "supervisora", "contabilidad", "caja_chica")
+                .requestMatchers(org.springframework.http.HttpMethod.PATCH, apiPrefix + "/despachos/**").hasAnyAuthority("gerente", "supervisora", "conductor")
+                .requestMatchers(org.springframework.http.HttpMethod.POST, apiPrefix + "/produccion/**").hasAnyAuthority("gerente", "supervisora", "encargado_area")
+                .requestMatchers(org.springframework.http.HttpMethod.POST, apiPrefix + "/ordenes/**").hasAnyAuthority("gerente", "supervisora", "vendedora")
+                .anyRequest().authenticated()
             )
+            .exceptionHandling(errors -> errors
+                .authenticationEntryPoint((request, response, ex) -> response.sendError(401))
+                .accessDeniedHandler((request, response, ex) -> response.sendError(403)))
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

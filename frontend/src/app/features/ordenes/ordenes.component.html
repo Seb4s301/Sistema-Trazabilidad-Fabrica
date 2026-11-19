@@ -1,16 +1,17 @@
+<div *ngIf="errorCarga" class="alert alert-danger" role="alert">{{ errorCarga }}</div>
 <div class="page-header d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
   <div>
     <div class="eyebrow mb-1">ÓRDENES DE FABRICACIÓN</div>
     <h1 class="page-title">Órdenes</h1>
     <p class="page-subtitle">Gestiona y consulta las órdenes de producción.</p>
   </div>
-  <a routerLink="/ordenes/nueva" class="btn btn-ld-gold">+ Nueva orden</a>
+  <a *ngIf="authService.puedeCrearOrden()" routerLink="/ordenes/nueva" class="btn btn-ld-gold">+ Nueva orden</a>
 </div>
 
 <!-- Filtros -->
 <div class="filter-bar d-flex flex-wrap gap-2 mb-4">
   <input type="text" class="form-control search-input" placeholder="Buscar por orden o modelo"
-         (input)="onFiltroCambio()">
+         [(ngModel)]="busqueda">
 
   <select class="form-select filter-select" [(ngModel)]="filtroEstado" (change)="onFiltroCambio()">
     <option value="">Todos los estados</option>
@@ -19,6 +20,8 @@
     <option value="en_proceso">En proceso</option>
     <option value="calidad">En calidad</option>
     <option value="listo_despacho">Listo para despacho</option>
+    <option value="completado">Completado</option>
+    <option value="cancelado">Cancelado</option>
   </select>
 
   <select class="form-select filter-select" [(ngModel)]="filtroPrioridad" (change)="onFiltroCambio()">
@@ -62,7 +65,14 @@
           <td><span class="pill" [ngClass]="clasePrioridad(o.prioridad)"><span class="pill-dot"></span>{{ o.prioridad }}</span></td>
           <td><span class="pill" [ngClass]="'pill-' + estadoDe(o).clase"><span class="pill-dot"></span>{{ estadoDe(o).label }}</span></td>
           <td class="cell-muted">{{ o.lote }}</td>
-          <td>{{ o.entrega }}</td>
+          <td>{{ o.entrega }}
+            <button class="btn btn-sm btn-outline-dark" (click)="verHistorial(o)">Detalle e historial</button>
+            <ng-container *ngIf="o.estado === 'borrador' && authService.puedeCrearOrden()">
+              <a class="btn btn-sm btn-outline-dark" [routerLink]="['/ordenes', o.numero, 'editar']">Editar</a>
+              <button class="btn btn-sm btn-outline-danger" (click)="eliminar(o)">Eliminar</button>
+            </ng-container>
+    <button *ngIf="o.estado === 'borrador' && authService.puedeCrearOrden()" class="btn btn-sm btn-outline-dark" (click)="confirmar(o)">Confirmar borrador</button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -89,8 +99,16 @@
       <div><span class="lbl">Lote</span><span class="val">{{ o.lote }}</span></div>
       <div><span class="lbl">Entrega</span><span class="val">{{ o.entrega }}</span></div>
     </div>
+    <button class="btn btn-sm btn-outline-dark" (click)="verHistorial(o)">Detalle e historial</button>
+            <ng-container *ngIf="o.estado === 'borrador' && authService.puedeCrearOrden()">
+              <a class="btn btn-sm btn-outline-dark" [routerLink]="['/ordenes', o.numero, 'editar']">Editar</a>
+              <button class="btn btn-sm btn-outline-danger" (click)="eliminar(o)">Eliminar</button>
+            </ng-container>
+    <button *ngIf="o.estado === 'borrador' && authService.puedeCrearOrden()" class="btn btn-sm btn-outline-dark" (click)="confirmar(o)">Confirmar borrador</button>
   </div>
   <div *ngIf="ordenesFiltradas.length === 0" class="empty-state text-center">
     <p>Sin órdenes para este filtro</p>
   </div>
 </div>
+
+<app-historial *ngIf="detalle" [titulo]="detalle.numero + (historialDeLote ? ' · Fabricación' : ' · Orden')" [alternativa]="detalle.loteId ? (historialDeLote ? 'Ver movimientos de la orden' : 'Ver trazabilidad de fabricación') : ''" (alternar)="cambiarHistorial()" [observaciones]="detalle.observaciones || ''" [items]="movimientos" [cargando]="historialCargando" [error]="historialError" (cerrado)="detalle = null"></app-historial>

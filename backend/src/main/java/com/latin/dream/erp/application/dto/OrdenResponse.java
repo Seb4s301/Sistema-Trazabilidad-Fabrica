@@ -9,6 +9,12 @@ public class OrdenResponse {
 
     private String id;              // UUID
     private String numero;          // OP-AAAA-NNNN
+    private String modeloId;
+    private String observaciones;
+    public String getModeloId() { return modeloId; }
+    public void setModeloId(String v) { modeloId=v; }
+    public String getObservaciones() { return observaciones; }
+    public void setObservaciones(String v) { observaciones=v; }
     private String modelo;          // nombre del modelo para frontend
     private String modeloNombre;
     private String modeloCodigo;
@@ -19,6 +25,9 @@ public class OrdenResponse {
     private String entrega;         // Formato fecha amigable para el frontend (ej. 24 oct. 2026)
     private String estado;
     private String etapaInicial;    // ej. "Pendiente de corte"
+    private String loteId;
+    public String getLoteId() { return loteId; }
+    public void setLoteId(String valor) { loteId=valor; }
     private String lote;            // ej. "LT-2610-0420"
     private String registradoPor;
     private String turno;

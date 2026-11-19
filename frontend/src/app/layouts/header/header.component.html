@@ -22,14 +22,9 @@
   <div class="header-right">
     <span class="header-date d-none d-sm-inline">{{ today }}</span>
 
-    <button type="button" class="icon-btn" title="Buscar">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <circle cx="11" cy="11" r="8"></circle>
-        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-      </svg>
-    </button>
-
-    <button type="button" class="icon-btn" title="Notificaciones">
+    <form class="d-none d-md-flex" (ngSubmit)="buscar()"><input class="form-control form-control-sm" style="max-width:180px" name="busqueda" [(ngModel)]="busqueda" placeholder="Orden o modelo" aria-label="Buscar órdenes"><button class="icon-btn" type="submit" title="Buscar">⌕</button></form>
+    <button type="button" class="icon-btn d-md-none" title="Buscar órdenes" (click)="busquedaAbierta = !busquedaAbierta">⌕</button>
+    <button type="button" class="icon-btn" title="Alertas de planta" (click)="abrirAlertas()" [attr.aria-expanded]="alertasAbiertas">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
@@ -41,3 +36,13 @@
     </span>
   </div>
 </header>
+
+<section *ngIf="alertasAbiertas" class="card p-3 position-fixed" style="right:1rem;top:4rem;z-index:1040;max-width:360px" aria-label="Alertas de planta">
+<div class="d-flex justify-content-between"><strong>Alertas de planta</strong><button class="btn btn-sm" (click)="alertasAbiertas=false" aria-label="Cerrar alertas">×</button></div>
+<p *ngIf="cargandoAlertas">Consultando…</p><p *ngIf="errorAlertas" role="alert">{{errorAlertas}}</p><p *ngIf="!cargandoAlertas && !errorAlertas && !alertas.length">No hay alertas de retraso.</p>
+<a class="py-2" *ngFor="let a of alertas" [routerLink]="a.ruta" (click)="alertasAbiertas=false">{{a.texto}}</a>
+</section>
+
+<form *ngIf="busquedaAbierta" class="card p-3 position-fixed" style="left:1rem;right:1rem;top:4rem;z-index:1050" (ngSubmit)="buscar()">
+<label>Buscar órdenes<input class="form-control" name="busquedaMovil" [(ngModel)]="busqueda" placeholder="Número de orden o modelo"></label><div class="d-flex gap-2 mt-2"><button class="btn btn-ld-gold">Buscar</button><button class="btn btn-outline-dark" type="button" (click)="busquedaAbierta=false">Cerrar</button></div>
+</form>

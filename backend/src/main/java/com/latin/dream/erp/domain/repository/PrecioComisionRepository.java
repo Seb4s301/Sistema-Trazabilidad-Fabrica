@@ -7,5 +7,4 @@ import java.util.List;
 
 @Repository
 public interface PrecioComisionRepository extends JpaRepository<PrecioComision, String> {
-    List<PrecioComision> findByModeloId(String modeloId);
 }

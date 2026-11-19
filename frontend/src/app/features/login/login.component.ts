@@ -14,6 +14,7 @@ export class LoginComponent {
   loading = false;
   errorMessage = '';
   mostrarPassword = false;
+  mostrarAyuda = false;
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.form = this.fb.group({
@@ -28,6 +29,7 @@ export class LoginComponent {
   }
 
   onSubmit(): void {
+    if (this.loading) return;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -41,7 +43,7 @@ export class LoginComponent {
       password: this.form.value.password
     };
 
-    this.authService.login(request).subscribe({
+    this.authService.login(request, !!this.form.value.recordar).subscribe({
       next: () => {
         this.loading = false;
         this.router.navigate(['/resumen']);

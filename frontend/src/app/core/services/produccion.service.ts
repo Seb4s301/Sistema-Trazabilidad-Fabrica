@@ -5,11 +5,13 @@ import { ENDPOINTS } from '../api.config';
 
 export interface Lote {
   id?: string;
+  observaciones?: string;
   codigo: string;
   orden: string;
   modelo: string;
   plaza: string;
   unidades: number;
+  disponibles?: number; reservadas?: number; entregadas?: number; pendientes?: number;
   area_actual?: string;
   prioridad: string;
   responsable: string;
@@ -62,73 +64,11 @@ export class ProduccionService {
     return this.http.get<ProduccionData>(`${ENDPOINTS.produccion}`);
   }
 
-  getLotes(): Observable<Lote[]> {
-    return this.http.get<Lote[]>(`${ENDPOINTS.lotes}`);
+  historial(id: string): Observable<import('../../shared/historial.component').RegistroHistorial[]> {
+    return this.http.get<import('../../shared/historial.component').RegistroHistorial[]>(`${ENDPOINTS.produccion}/lotes/${id}/historial`);
   }
-
-  actualizarLote(id: string, data: Partial<Lote>): Observable<Lote> {
-    return this.http.patch<Lote>(`${ENDPOINTS.lotes}/${id}`, data);
-  }
-
   registrarAvance(data: AvanceLote): Observable<AvanceLote> {
     return this.http.post<AvanceLote>(`${ENDPOINTS.produccion}/avances`, data);
   }
 
-  // Demo data fallback
-  getDemoData(): ProduccionData {
-    return {
-      metricas: [
-        { etiqueta: 'Lotes en planta', valor: '8' },
-        { etiqueta: 'Unidades en planta', valor: '780' },
-        { etiqueta: 'Lotes con retraso', valor: '2', peligro: true },
-        { etiqueta: 'Listas para despacho', valor: '80' }
-      ],
-      areas: [
-        {
-          id: 'corte',
-          nombre: 'Corte',
-          subtitulo: 'Corte de telas y espumas · 240 unidades',
-          lotes: [
-            { orden: 'OP-2026-0419', modelo: 'Eco Sleep', plaza: '2 Plazas', unidades: 60, codigo: 'LT-2610-0419', prioridad: 'Normal', responsable: 'Ana Torres', iniciales: 'AT', entrega: '24 oct. 2026' },
-            { orden: 'OP-2026-0418', modelo: 'Comfort Plus', plaza: 'Queen', unidades: 180, codigo: 'LT-2610-0418', prioridad: 'Alta', responsable: 'Luis García', iniciales: 'LG', entrega: '22 oct. 2026', diasRetraso: 1 }
-          ]
-        },
-        {
-          id: 'ensamblaje',
-          nombre: 'Ensamblaje',
-          subtitulo: 'Núcleo y estructura · 190 unidades',
-          lotes: [
-            { orden: 'OP-2026-0417', modelo: 'Dream Rest', plaza: 'King', unidades: 80, codigo: 'LT-2610-0417', prioridad: 'Normal', responsable: 'Carla Ruiz', iniciales: 'CR', entrega: '21 oct. 2026' },
-            { orden: 'OP-2026-0416', modelo: 'Premium Rest', plaza: '1.5 Plazas', unidades: 110, codigo: 'LT-2610-0416', prioridad: 'Baja', responsable: 'Jorge Lima', iniciales: 'JL', entrega: '25 oct. 2026' }
-          ]
-        },
-        {
-          id: 'tapizado',
-          nombre: 'Tapizado',
-          subtitulo: 'Costura y tapizado final · 160 unidades',
-          lotes: [
-            { orden: 'OP-2026-0415', modelo: 'Comfort Plus', plaza: 'Queen', unidades: 160, codigo: 'LT-2610-0415', prioridad: 'Alta', responsable: 'María Rojas', iniciales: 'MR', entrega: '20 oct. 2026', diasRetraso: 2 }
-          ]
-        },
-        {
-          id: 'calidad',
-          nombre: 'Calidad',
-          subtitulo: 'Inspección y control · 110 unidades',
-          lotes: [
-            { orden: 'OP-2026-0414', modelo: 'Eco Sleep', plaza: '2 Plazas', unidades: 110, codigo: 'LT-2610-0414', prioridad: 'Normal', responsable: 'Diego Ruiz', iniciales: 'DR', entrega: '19 oct. 2026' }
-          ]
-        },
-        {
-          id: 'listo',
-          nombre: 'Listo',
-          subtitulo: 'Alistados para despacho · 80 unidades',
-          lotes: [
-            { orden: 'OP-2026-0413', modelo: 'Premium Rest', plaza: '1.5 Plazas', unidades: 80, codigo: 'LT-2610-0413', prioridad: 'Normal', responsable: 'Sofía Melgar', iniciales: 'SM', entrega: '18 oct. 2026', aprobado: true }
-          ]
-        }
-      ],
-      totalLotes: 8,
-      totalUnidades: 780
-    };
-  }
 }

@@ -42,6 +42,7 @@ public class Lote {
     private LocalDate fechaEntrega;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean retrasado = false;
 
     @Column(name = "creado_en", nullable = false)
@@ -49,10 +50,6 @@ public class Lote {
 
     @Column(name = "actualizado_en")
     private LocalDateTime actualizadoEn;
-
-    public boolean estaEnPlanta() {
-        return !"Listo".equalsIgnoreCase(areaActual);
-    }
 
     @PrePersist
     void onCreate() {

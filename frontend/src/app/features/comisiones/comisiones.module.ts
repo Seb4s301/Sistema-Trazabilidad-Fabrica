@@ -1,3 +1,4 @@
+import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
@@ -9,6 +10,6 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [ComisionesComponent],
-  imports: [CommonModule, RouterModule.forChild(routes)]
+  imports: [FormsModule,CommonModule, RouterModule.forChild(routes)]
 })
 export class ComisionesModule {}

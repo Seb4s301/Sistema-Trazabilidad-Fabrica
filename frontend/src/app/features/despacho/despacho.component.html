@@ -1,18 +1,14 @@
+<div *ngIf="errorCarga" class="alert alert-danger" role="alert">{{ errorCarga }}</div>
 <div class="page-header d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
   <div>
     <div class="eyebrow mb-1">DESPACHO Y TRANSPORTE / OPERACIÓN DEL DÍA</div>
     <h1 class="page-title">{{ tituloFecha }}</h1>
     <p class="page-subtitle">{{ resumen }}</p>
   </div>
-  <div class="d-flex gap-2 flex-wrap">
-    <button type="button" class="btn btn-outline-dark">
-      <span class="btn-icon">↓</span> Exportar resumen
-    </button>
-    <button type="button" class="btn btn-ld-gold">
-      <span class="btn-icon">↓</span> Programar despacho
-    </button>
-  </div>
+
 </div>
+
+<button class="btn btn-ld-gold mb-3" *ngIf="authService.puedeGestionarDespacho()" (click)="programar()">+ Programar despacho</button>
 
 <!-- KPIs -->
 <div class="kpi-grid row g-3 mb-4" *ngIf="!cargando">
@@ -38,6 +34,7 @@
           <option value="programado">Programado</option>
           <option value="transito">En tránsito</option>
           <option value="entregado">Entregado</option>
+          <option value="cancelado">Cancelado</option>
         </select>
       </div>
       <div class="filter-field">
@@ -61,9 +58,7 @@
           <span class="input-icon-right">📅</span>
         </div>
       </div>
-      <button type="button" class="btn btn-ld-gold w-100 mt-2" (click)="aplicarFiltros()">
-        Aplicar filtros
-      </button>
+
     </div>
   </div>
 
@@ -72,7 +67,7 @@
     <div class="tracking-panel">
       <div class="tracking-header d-flex justify-content-between align-items-center mb-3">
         <h5 class="section-h mb-0">Seguimiento de envíos</h5>
-        <span class="muted-small">{{ despachosFiltrados.length }} despachos activos</span>
+        <span class="muted-small">{{ despachosFiltrados.length }} despachos registrados</span>
       </div>
 
       <div class="ship-list d-flex flex-column gap-3">
@@ -120,7 +115,7 @@
   <div class="detail-header d-flex justify-content-between align-items-center mb-1">
     <div>
       <div class="detail-title">Detalle del despacho</div>
-      <div class="detail-meta">{{ detalleAbierto.codigo }} · Salida programada para hoy {{ detalleAbierto.salida }}</div>
+      <div class="detail-meta">{{ detalleAbierto.codigo }} · Salida programada: {{ detalleAbierto.salida }}</div>
     </div>
     <span class="pill" [ngClass]="claseEstado(detalleAbierto.estado)">
       <span class="pill-dot"></span>{{ estadoLabel(detalleAbierto.estado) }}
@@ -142,8 +137,8 @@
     <div class="col-12 col-md-6">
       <div class="detail-block">
         <div class="block-title">Preparación de carga</div>
-        <div class="block-row"><span class="lbl">Lote asociado</span><span class="val">LT-2610-0424</span></div>
-        <div class="block-row"><span class="lbl">Producto</span><span class="val">Dream Premium Queen</span></div>
+        <div class="block-row"><span class="lbl">Lote asociado</span><span class="val">{{ detalleAbierto.lote }}</span></div>
+        <div class="block-row"><span class="lbl">Producto</span><span class="val"><span *ngFor="let l of detalleAbierto.lotes">{{ l.modelo }} ({{ l.cantidad }}) </span></span></div>
         <div class="block-row"><span class="lbl">Carga</span><span class="val">{{ detalleAbierto.unidades }} unidades</span></div>
         <div class="block-row"><span class="lbl">Salida</span><span class="val">{{ detalleAbierto.salida }}</span></div>
         <div class="block-row"><span class="lbl">Entrega estimada</span><span class="val">{{ detalleAbierto.entregaEstimada }}</span></div>
@@ -157,87 +152,22 @@
         <div class="block-title">Asignación de vehículo y conductor</div>
         <div class="block-row"><span class="lbl">Vehículo</span><span class="val">{{ detalleAbierto.vehiculo }}</span></div>
         <div class="block-row"><span class="lbl">Conductor</span><span class="val">{{ detalleAbierto.conductor }}</span></div>
-        <div class="block-row"><span class="lbl">Contacto</span><span class="val">+51 987 654 321</span></div>
-        <div class="block-row"><span class="lbl">Capacidad</span><span class="val">100 colchones</span></div>
-        <div class="block-row"><span class="lbl">Estado del vehículo</span><span class="val">Lista para carga</span></div>
-        <div class="block-row"><span class="lbl">Última revisión</span><span class="val">15 oct. 2026</span></div>
       </div>
     </div>
   </div>
 
-  <!-- Documentos y etiqueta -->
-  <div class="detail-block mb-4">
-    <div class="block-title">Documentos y etiqueta</div>
-    <div class="doc-row">
-      <div class="doc-info">
-        <span class="doc-icon">📄</span>
-        <div>
-          <div class="doc-name">Orden de despacho</div>
-          <div class="doc-meta">{{ detalleAbierto.codigo }} · PDF · 184 KB</div>
-        </div>
-      </div>
-      <button class="btn-icon-only" title="Descargar">↓</button>
-    </div>
-    <div class="doc-row">
-      <div class="doc-info">
-        <span class="doc-icon">📄</span>
-        <div>
-          <div class="doc-name">Guía de remisión</div>
-          <div class="doc-meta">GR-2026-1048 · PDF · 96 KB</div>
-        </div>
-      </div>
-      <button class="btn-icon-only" title="Descargar">↓</button>
-    </div>
-    <div class="etiqueta-row">
-      <div class="etiqueta-preview">
-        <div class="etiqueta-id">{{ detalleAbierto.codigo }}</div>
-        <div class="etiqueta-desc">Etiqueta para identificar el despacho en planta.</div>
-      </div>
-      <button class="btn btn-outline-dark btn-sm">Imprimir etiqueta +</button>
-    </div>
-  </div>
+  <button class="btn btn-outline-dark me-2" *ngIf="puedeEditar(detalleAbierto)" (click)="programar(detalleAbierto)">Editar / asociar lotes</button>
+  <button *ngIf="authService.puedeGestionarDespacho() && detalleAbierto.estado !== 'entregado' && detalleAbierto.estado !== 'cancelado'" class="btn btn-ld-gold" (click)="abrirModalEstado(detalleAbierto)">Cambiar estado</button>
 </div>
 
-<!-- Historial de despachos -->
-<div *ngIf="!cargando">
-  <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
-    <h5 class="section-h mb-0">Historial de despachos</h5>
-    <span class="muted-small">{{ historial.length }} registros</span>
+<div class="card ld-card mt-4" *ngIf="!cargando">
+  <div class="card-header">Historial de despachos</div>
+  <div class="table-responsive d-none d-md-block">
+    <table class="table ld-table mb-0">
+      <thead><tr><th>Despacho</th><th>Cliente</th><th>Unidades</th><th>Estado</th><th>Salida</th><th>Entrega estimada</th></tr></thead>
+      <tbody><tr *ngFor="let h of historial"><td>{{ h.despacho }}</td><td>{{ h.cliente }}</td><td>{{ h.unidades }}</td><td>{{ h.estado }}</td><td>{{ h.salida }}</td><td>{{ h.entrega }}</td></tr></tbody>
+    </table>
   </div>
-
-  <div class="card ld-card d-none d-md-block">
-    <div class="table-responsive">
-      <table class="table ld-table align-middle mb-0">
-        <thead>
-          <tr>
-            <th>Despacho</th>
-            <th>Cliente</th>
-            <th>Unidades</th>
-            <th>Estado</th>
-            <th>Salida</th>
-            <th>Entrega</th>
-            <th>Vehículo</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let h of historial">
-            <td class="cell-strong">{{ h.despacho }}</td>
-            <td>{{ h.cliente }}</td>
-            <td>{{ h.unidades }}</td>
-            <td>
-              <span class="pill" [ngClass]="claseHistorial(h.estado)">
-                <span class="pill-dot"></span>{{ h.estado }}
-              </span>
-            </td>
-            <td>{{ h.salida }}</td>
-            <td>{{ h.entrega }}</td>
-            <td>{{ h.vehiculo }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
   <!-- Historial tarjetas (móvil) -->
   <div class="hist-cards d-md-none">
     <div class="hist-card" *ngFor="let h of historial">
@@ -267,3 +197,5 @@
   (estadoCambiado)="onEstadoCambiado()"
   (cerrado)="modalEstadoVisible = false">
 </app-estado-despacho-modal>
+
+<app-programar-despacho *ngIf="programarVisible" [despacho]="editando" (cerrado)="programarVisible = false" (guardado)="onGuardado()"></app-programar-despacho>

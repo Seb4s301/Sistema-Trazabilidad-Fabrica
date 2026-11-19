@@ -44,12 +44,12 @@ public class JwtService {
 
     public String generarToken(Usuario usuario) {
         return Jwts.builder()
-            .setSubject(usuario.getCorreo())
+            .subject(usuario.getCorreo())
             .claim("rol", usuario.getRol())
             .claim("nombre", usuario.getNombre())
             .claim("turno", usuario.getTurno())
-            .setIssuedAt(new Date(System.currentTimeMillis()))
-            .setExpiration(new Date(System.currentTimeMillis() + jwtConfig.getExpiration()))
+            .issuedAt(new Date(System.currentTimeMillis()))
+            .expiration(new Date(System.currentTimeMillis() + jwtConfig.getExpiration()))
             .signWith(jwtConfig.secretKey())
             .compact();
     }

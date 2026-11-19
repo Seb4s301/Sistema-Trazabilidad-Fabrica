@@ -13,11 +13,18 @@ import java.util.Optional;
 @Repository
 public interface LoteRepository extends JpaRepository<Lote, String> {
 
-    List<Lote> findByAreaActual(String areaActual);
 
+    @Override
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    Optional<Lote> findById(String id);
+
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
     Optional<Lote> findByCodigo(String codigo);
+
+    @Override
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"orden", "orden.modelo", "orden.registradoPor"})
+    List<Lote> findAll();
 
     List<Lote> findByOrdenNumero(String numeroOrden);
 
-    boolean existsByCodigo(String codigo);
 }
